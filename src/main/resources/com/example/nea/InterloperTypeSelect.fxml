@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane fx:id="scenePane" prefHeight="650.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.nea.InterloperTypeSelectController">
+    <Button layoutX="14.0" layoutY="140.0" onAction="#onRandomInterloperClick" prefHeight="90" prefWidth="350.0" text="Random" textFill="WHITE" textOverrun="WORD_ELLIPSIS">
+        <font>
+            <Font size="24.0" />
+        </font></Button>
+    <Button layoutX="14.0" layoutY="240.0" onAction="#onSpecifiedInterloperCLick" prefHeight="90" prefWidth="350.0" text="Specified" textFill="WHITE" textOverrun="WORD_ELLIPSIS">
+        <font>
+            <Font size="24.0" />
+        </font></Button>
+    <Button layoutX="14.0" layoutY="340.0" onAction="#onNoInterloperCLick" prefHeight="90" prefWidth="350.0" text="None" textFill="WHITE" textOverrun="WORD_ELLIPSIS">
+        <font>
+            <Font size="24.0" />
+        </font></Button>
+    <Label layoutX="274.0" layoutY="26.0" prefHeight="70.0" prefWidth="434.0" text="Select type of interloper">
+        <font>
+            <Font size="40.0" />
+        </font>
+    </Label>
+</AnchorPane>

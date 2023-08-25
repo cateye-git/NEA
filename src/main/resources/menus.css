@@ -1,0 +1,28 @@
+.root{
+    -fx-background-color: #333333;
+}
+.button{
+    -fx-background-color:#1a1a1a;
+    -fx-text-fill: white;
+    -fx-font-size: 24px;
+}
+.label{
+    -fx-text-fill: white;
+}
+.listview{
+    -fx-background-color: black;
+}
+.list-cell:even {
+    -fx-background-color: #404040;
+    -fx-text-fill: white;
+}
+.list-cell:odd {
+    -fx-background-color: #4d4d4d;
+    -fx-text-fill: white;
+}
+.list-cell:filled:hover {
+    -fx-background-color: #808080;
+}
+.list-cell:filled:selected {
+    -fx-background-color: #8c8c8c;
+}

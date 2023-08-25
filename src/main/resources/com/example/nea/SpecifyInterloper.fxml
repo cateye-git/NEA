@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane fx:id="scenePane" prefHeight="650.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.nea.InterloperSpecifyController">
+    <Button layoutX="14.0" layoutY="141.0" onAction="#finishSpecifyingClick" prefHeight="90" prefWidth="350.0" text="Done" textFill="WHITE" textOverrun="WORD_ELLIPSIS">
+        <font>
+            <Font size="24.0" />
+        </font></Button>
+    <Label layoutX="249.0" layoutY="27.0" prefHeight="70.0" prefWidth="502.0" text="Select Interloper Parameters">
+        <font>
+            <Font size="40.0" />
+        </font>
+    </Label>
+    <TextField fx:id="posX" layoutX="589.0" layoutY="172.0" prefHeight="27.0" prefWidth="73.0" text="0" />
+    <TextField fx:id="posY" layoutX="675.0" layoutY="172.0" prefHeight="27.0" prefWidth="73.0" text="0" />
+    <TextField fx:id="posZ" layoutX="760.0" layoutY="172.0" prefHeight="27.0" prefWidth="73.0" text="0" />
+    <TextField fx:id="velZ" layoutX="760.0" layoutY="229.0" prefHeight="27.0" prefWidth="73.0" text="0" />
+    <TextField fx:id="velY" layoutX="675.0" layoutY="229.0" prefHeight="27.0" prefWidth="73.0" text="0" />
+    <TextField fx:id="velX" layoutX="590.0" layoutY="229.0" prefHeight="27.0" prefWidth="73.0" text="0" />
+    <Label layoutX="453.0" layoutY="170.0" text="Position (x,y,z)" textFill="#c0c0c0">
+        <font>
+            <Font size="20.0" />
+        </font>
+    </Label>
+    <Label layoutX="453.0" layoutY="228.0" text="Velocity (x,y,z)" textFill="#c0c0c0">
+        <font>
+            <Font size="20.0" />
+        </font>
+    </Label>
+    <Label layoutX="453.0" layoutY="325.0" text="Mass" textFill="#c0c0c0">
+        <font>
+            <Font size="20.0" />
+        </font>
+    </Label>
+    <TextField fx:id="mass" layoutX="589.0" layoutY="327.0" prefHeight="27.0" prefWidth="73.0" text="1e18" />
+    <Label layoutX="453.0" layoutY="368.0" text="Radius" textFill="#c0c0c0">
+        <font>
+            <Font size="20.0" />
+        </font>
+    </Label>
+    <TextField fx:id="radius" layoutX="589.0" layoutY="369.0" prefHeight="27.0" prefWidth="73.0" text="2e4" />
+    <Label layoutX="453.0" layoutY="410.0" text="Name" textFill="#c0c0c0">
+        <font>
+            <Font size="20.0" />
+        </font>
+    </Label>
+    <TextField fx:id="name" layoutX="589.0" layoutY="411.0" prefHeight="27.0" prefWidth="73.0" text="interloper" />
+</AnchorPane>
