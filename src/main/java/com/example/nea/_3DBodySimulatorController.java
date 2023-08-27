@@ -43,10 +43,17 @@ public class _3DBodySimulatorController implements Initializable {
             selectBody.getItems().add(body);
         }
         selectBody.setOnAction(this::selectBodyToFollow);
+        selectBody.setOnMousePressed(this::updateBodies);
     }
 
+    private void updateBodies(MouseEvent mouseEvent) {
+        selectBody.getItems().remove(0,selectBody.getItems().size()); //remove all elements
+        for(Body body : Simulator.getBodies()){
+            selectBody.getItems().add(body);
+        }
+    }
 
-    public void selectBodyToFollow(ActionEvent event){
+    private void selectBodyToFollow(ActionEvent event){
         //update items in selection box
         int id = selectBody.getValue().getSimulationID();
         //Simulator.getBodies().indexOf(body);

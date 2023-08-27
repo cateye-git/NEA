@@ -40,7 +40,9 @@ public class Simulator {        //will not let me set it to static???
 
     public static void updateBodies(double dt){
         PlanetSystem.RK4(bodies, dt);
+        PlanetSystem.checkCollisions(bodies);
     }
+
 
     private static ArrayList<Body> getSystemData(int systemID){
 

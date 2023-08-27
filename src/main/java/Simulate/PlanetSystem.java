@@ -156,7 +156,7 @@ public class PlanetSystem {
         }
     }
 
-    private static void checkCollisions(ArrayList<Body> bodies){
+    public static void checkCollisions(ArrayList<Body> bodies){
         // given that we can treat all bodies as spheres, the easiest way to check for any collisions is to look at
         // whether the distance between any two planets is less than the sum of their radii.
         // if so, a collision has occured

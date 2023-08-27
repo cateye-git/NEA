@@ -179,6 +179,12 @@ public class HelloApplication extends Application {
 
                 Simulator.updateBodies(deltaTime);
                 // now we need to update the spheres
+
+                //in case any bodies have been removed (collisions):
+                while(bodies.size() < spheres.size()){
+                    spheres.remove(0);
+                }
+                //update remaining spheres
                 int counter =0;
                 for(Sphere sphere : spheres){
                     Vector3D bodyPos = bodies.get(counter).getPosition();
