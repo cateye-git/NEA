@@ -25,7 +25,7 @@ public class PlanetSystem {
         double accelerationMag2 = force / b2Mass; //     get acceleration on body 2 from force
         Vector3D acceleration2 = Vector3D.multiply(unitPosVector2to1, accelerationMag2);
 
-        System.out.println("a1 = "+acceleration1 + " a2 = "+acceleration2);
+      //  System.out.println("a1 = "+acceleration1 + " a2 = "+acceleration2);
 
         Vector3D[] accs = {acceleration1, acceleration2};
         return accs;

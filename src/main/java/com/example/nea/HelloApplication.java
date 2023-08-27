@@ -19,24 +19,25 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 public class HelloApplication extends Application {
+
+    private static final double everythingMultiplier = 1e-5f;
 
     private static final int screenWidth = 1400;        //  setting the width of the window
     private static final int screenHeight = 1000;       //  setting the height of the window
 
     private static final double mouseSens = 0.1f;
-
-    private double timeElapsed = 0;
-
-    private static long time;
-    private static double camSpeed = 1e6;
-    private static double dtMultiplier = 100;
+    private static double camSpeed = 1e6*everythingMultiplier;
+    private static double dtMultiplier = 1;
 
     private static boolean following = false;
     private Body followBody;
+    private double lastTime;
 
-    private Camera cam;
+    private PerspectiveCamera cam;
     private double camLocalXpos = 0;
     private double camLocalYpos = 0;
     private double camLocalZpos = 0;
@@ -62,7 +63,7 @@ public class HelloApplication extends Application {
         //reset all translations
         camLocalXpos = 0;
         camLocalYpos = 0;
-        camLocalZpos = -1e8;
+        camLocalZpos = -1e8*everythingMultiplier;
 
         //set all translations relative to this body
         translateCam();
@@ -75,13 +76,13 @@ public class HelloApplication extends Application {
 
         ArrayList<Sphere> spheres = new ArrayList<>();
         for(Body body : bodies){
-            Sphere sphere = new Sphere(200);
-            sphere.setRadius(body.getRadius());
+            Sphere sphere = new Sphere(0);
+            sphere.setRadius(body.getRadius()*everythingMultiplier);
          //   sphere.translateXProperty().set(screenWidth/2);             //  moving the sphere to the centre of the screen
          //   sphere.translateYProperty().set(screenHeight/2);
-            sphere.translateXProperty().set(body.getPosition().getComponent(0));
-            sphere.translateYProperty().set(body.getPosition().getComponent(1)*-1);
-            sphere.translateZProperty().set(body.getPosition().getComponent(2));
+            sphere.translateXProperty().set(body.getPosition().getComponent(0)*everythingMultiplier);
+            sphere.translateYProperty().set(body.getPosition().getComponent(1)*everythingMultiplier*-1);
+            sphere.translateZProperty().set(body.getPosition().getComponent(2)*everythingMultiplier);
             System.out.println("added sphere at "+body.getPosition().getComponent(0)+ " " + body.getPosition().getComponent(1)*-1 + " "+ body.getPosition().getComponent(2));
             group.getChildren().add(sphere);
 
@@ -95,9 +96,11 @@ public class HelloApplication extends Application {
         Scene scene = new Scene(group,screenWidth,screenHeight, true);    //  making the scene object so that we can actually make a new window
 
 
-        cam = new PerspectiveCamera();                       //  instantiating a camera with the correct properties
+        cam = new PerspectiveCamera(true);                       //  instantiating a camera with the correct properties
         cam.setNearClip(0.01f);
         cam.setFarClip(1e100);
+        cam.setFieldOfView(100);
+
       //  cam.translateZProperty().set(cam.getTranslateZ() -100);     //  moving the camera back
         scene.setFill(Paint.valueOf("black"));
 
@@ -158,30 +161,34 @@ public class HelloApplication extends Application {
         AnimationTimer timer = new AnimationTimer() {
             @Override
             public void handle(long l) {
-                double deltaTime = l - time;
-               // System.out.println(deltaTime);
-                //so that if too much time has elapsed (eg at start or when user suspends application) we do not do anything
-              //  System.out.println("dt is: "+deltaTime);
-                if((l - time)> 1e8) {
-                    System.out.println("too much time has elaped");
-                    time = l;
-                    deltaTime = 0;
+
+                double nanoTime = Duration.between(LocalDateTime.MIN, LocalDateTime.now()).getNano(); //gets the nanoseconds part of the time between now and the epoch
+                double deltaTime = nanoTime - lastTime;
+                if(deltaTime < 0){
+                    deltaTime += 1e9; //so if it goes from say 0.9 secs to 0.1, the dt will be
+                    //          0.1-0.9 = -0.8
+                    //          so we add 1 to it to get 0.2 which is the true time elapsed
+                    //          that is unless more than a second has passed, in which case the simulation is running
+                    //          too slowly anyway, so is not a valuable thing to consider
                 }
-                timeElapsed += deltaTime * dtMultiplier;
-              //  System.out.println(timeElapsed);
-                Simulator.updateBodies(deltaTime/1e7*dtMultiplier);
-                time = l;
+
+                lastTime = nanoTime;
+
+                deltaTime *= dtMultiplier / 1e9;
+                System.out.println(deltaTime);
+
+                Simulator.updateBodies(deltaTime);
                 // now we need to update the spheres
                 int counter =0;
                 for(Sphere sphere : spheres){
                     Vector3D bodyPos = bodies.get(counter).getPosition();
-                    System.out.println(bodyPos);
                    // System.out.println(bodyPos);
-                    sphere.setTranslateX(bodyPos.getComponent(0));
-                    sphere.setTranslateY(bodyPos.getComponent(1));
-                    sphere.setTranslateZ(bodyPos.getComponent(2));
+                    sphere.setTranslateX(bodyPos.getComponent(0)*everythingMultiplier);
+                    sphere.setTranslateY(bodyPos.getComponent(1)*-everythingMultiplier);
+                    sphere.setTranslateZ(bodyPos.getComponent(2)*everythingMultiplier);
                     counter++;
                 }
+
                 translateCam();
 
 
@@ -193,7 +200,7 @@ public class HelloApplication extends Application {
 
 
 
-        primaryStage.setTitle("test sphere");           //  naming our scene and building it
+        primaryStage.setTitle("Simulator 3D Window");           //  naming our scene and building it
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -216,7 +223,9 @@ public class HelloApplication extends Application {
     private void translateCam(){// updates position of camera.
         Vector3D followPos = new Vector3D(0,0,0);
         if(following) {
-            followPos = followBody.getPosition();
+            followPos = Vector3D.multiply(followBody.getPosition(),everythingMultiplier);
+
+
         }
         cam.setTranslateX(followPos.getComponent(0) + camLocalXpos);
         cam.setTranslateY(-followPos.getComponent(1) + camLocalYpos);
