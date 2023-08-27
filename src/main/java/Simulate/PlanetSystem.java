@@ -126,6 +126,7 @@ public class PlanetSystem {
             Vector3D kvTimesDt = Vector3D.multiply(kv[0][counter],dt/2); // multiply kv1 by dt/2
             Vector3D ksTimesDt = Vector3D.multiply(ks[0][counter],dt/2);// ks1 * dt/2
 
+            //ks1 = acceleration of (position + velocity)
             ks[1][counter] = Vector3D.add(positions[counter],kvTimesDt); // position + kv * dt/2
 
             // kv2 = v + ks1 * dt/2
