@@ -22,9 +22,9 @@ public class Simulator {        //will not let me set it to static???
         bodies = getSystemData(sysID);
     }
 
-    public static void setInterloper(Body inter) {
+    public static void setInterloper(Body inte) {
         // this is called by the GUI when an interloper is selected
-        interloper = inter;
+        interloper = inte;
     }
     public static void setRandomInterloper(){
         //when the user asks for no interloper
