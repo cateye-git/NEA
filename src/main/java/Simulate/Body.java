@@ -1,7 +1,16 @@
 package Simulate;
 
 public class Body {
+    public int getSimulationID() {
+        return simulationID;
+    }
+
+    public void setSimulationID(int simulationID) {
+        this.simulationID = simulationID;
+    }
+
     //getters for position and velocity
+    private int simulationID;
     public Vector3D getPosition() {
         return position;
     }

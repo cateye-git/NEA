@@ -30,8 +30,8 @@ public class HelloApplication extends Application {
     private double timeElapsed = 0;
 
     private static long time;
-    private static double camSpeed = 1e7;
-    private static double dtMultiplier = 1e-3;
+    private static double camSpeed = 1e6;
+    private static double dtMultiplier = 100;
 
     private static boolean following = false;
     private Body followBody;
@@ -47,7 +47,16 @@ public class HelloApplication extends Application {
 
     private static ArrayList<Body> bodies;
 
-    public void getNewFollowPos(Body body){
+    public void getNewFollowPos(int id){
+
+        //find body with this ID
+
+        for(Body body : bodies){
+            if(body.getSimulationID() == id){
+                //then we have found the correct ID
+                followBody = body;
+            }
+        }
 
         following = true;
         //reset all translations
@@ -56,7 +65,6 @@ public class HelloApplication extends Application {
         camLocalZpos = -1e8;
 
         //set all translations relative to this body
-        followBody = body;
         translateCam();
     }
 
@@ -115,28 +123,34 @@ public class HelloApplication extends Application {
             switch (keyEvent.getCode()) {
                 case W:
                    camLocalZpos += camSpeed;
-                   translateCam();
+                //   translateCam();
                     break;
                 case S:
                     camLocalZpos -= camSpeed;
-                    translateCam();
+                //    translateCam();
                     break;
 
                 case A:
                    camLocalXpos -= camSpeed;
-                    translateCam();
+                //    translateCam();
                     break;
                 case D:
                    camLocalXpos += camSpeed;
-                    translateCam();
+                 //   translateCam();
                     break;
                 case Q:
                    camLocalYpos -= camSpeed;
-                    translateCam();
+                 //   translateCam();
                     break;
                 case E:
                     camLocalYpos += camSpeed;
-                    translateCam();
+                    break;
+                case M:
+                    dtMultiplier *= 1.1f;
+                    //   translateCam();
+                    break;
+                case N:
+                    dtMultiplier *= 0.9f;
             }
         } );
 
@@ -154,19 +168,22 @@ public class HelloApplication extends Application {
                     deltaTime = 0;
                 }
                 timeElapsed += deltaTime * dtMultiplier;
-                System.out.println(timeElapsed);
+              //  System.out.println(timeElapsed);
                 Simulator.updateBodies(deltaTime/1e7*dtMultiplier);
                 time = l;
                 // now we need to update the spheres
                 int counter =0;
                 for(Sphere sphere : spheres){
                     Vector3D bodyPos = bodies.get(counter).getPosition();
+                    System.out.println(bodyPos);
                    // System.out.println(bodyPos);
                     sphere.setTranslateX(bodyPos.getComponent(0));
                     sphere.setTranslateY(bodyPos.getComponent(1));
                     sphere.setTranslateZ(bodyPos.getComponent(2));
                     counter++;
                 }
+                translateCam();
+
 
                // System.out.println("velocity = " + bodies.get(0).getVelocity());
                // System.out.println("position = " + bodies.get(0).getPosition());
@@ -197,7 +214,10 @@ public class HelloApplication extends Application {
     }
 
     private void translateCam(){// updates position of camera.
-        Vector3D followPos = followBody.getPosition();
+        Vector3D followPos = new Vector3D(0,0,0);
+        if(following) {
+            followPos = followBody.getPosition();
+        }
         cam.setTranslateX(followPos.getComponent(0) + camLocalXpos);
         cam.setTranslateY(-followPos.getComponent(1) + camLocalYpos);
         cam.setTranslateZ(followPos.getComponent(2) + camLocalZpos);

@@ -100,9 +100,6 @@ public class PlanetSystem {
         // v = dt/6 * (ks1 + 2ks2 + 2ks3 + ks4)
 
         // so first we need to set the coefficients:
-
-
-        System.out.println("calculating rk4 for "+bodies.size()+" bodies");
         Vector3D[][] kv = new Vector3D[4][bodies.size()]; //velocity coefficients
         Vector3D[][] ks = new Vector3D[4][bodies.size()]; //displacement coefficients:
 
@@ -119,77 +116,25 @@ public class PlanetSystem {
         }
         ks[0] = getAllAccelerations(positions,masses); // pass those positions and masses to calc acceleration
 
-        // second coefficients
-        ks[1] = getAllAccelerations(Vector3DArrayOperations.addVectors(positions,Vector3DArrayOperations.multiplyVectors(kv[0],dt/2)),masses); // acc of(position + kv0 * dt/2)
-        kv[1] = Vector3DArrayOperations.addVectors(kv[0],Vector3DArrayOperations.multiplyVectors(ks[0],dt/2)); // velocity + ks0 * dt/2
-
-       /* for(int counter = 0; counter < numBodies;counter++){
-            // the position to calc = position + kv1*dt/2
-            Vector3D kvTimesDt = Vector3D.multiply(kv[0][counter],dt/2); // multiply kv1 by dt/2
-            Vector3D ksTimesDt = Vector3D.multiply(ks[0][counter],dt/2);// ks1 * dt/2
-
-            //ks1 = acceleration of (position + velocity)
-
-
-            // kv2 = v + ks1 * dt/2
-            kv[1][counter] = Vector3D.add(kv[0][counter],ksTimesDt); // v + (ks1 * dt/2)
-        }
-
-        */
-
-        // third coefficients
-
         ks[2] = getAllAccelerations(Vector3DArrayOperations.addVectors(positions,Vector3DArrayOperations.multiplyVectors(kv[1],dt/2)),masses); // acc of(position + kv1 * dt/2)
         kv[2] = Vector3DArrayOperations.addVectors(kv[0],Vector3DArrayOperations.multiplyVectors(ks[1],dt/2)); // velocity + ks1 * dt/2
 
-        /*
-        for(int counter = 0; counter < numBodies;counter++){
-            // the position to calc = position + kv1*dt/2
-            Vector3D kvTimesDt = Vector3D.multiply(kv[1][counter],dt/2); // multiply kv2 by dt/2
-            Vector3D ksTimesDt = Vector3D.multiply(ks[1][counter],dt/2);// ks2 * dt/2
-            ks[2][counter] = Vector3D.add(positions[counter],kvTimesDt); // position + kv * dt/2
-
-            // kv3 = v + ks2 * dt/2
-
-            kv[2][counter] = Vector3D.add(kv[1][counter],ksTimesDt); // v + (ks2 * dt/2)
-        }
-
-         */
-
-        // final coefficients
         ks[3] = getAllAccelerations(Vector3DArrayOperations.addVectors(positions,Vector3DArrayOperations.multiplyVectors(kv[2],dt)),masses); // acc of(position + kv2 * dt)
         kv[3] = Vector3DArrayOperations.addVectors(kv[0],Vector3DArrayOperations.multiplyVectors(ks[2],dt)); // velocity + ks2 * dt
-
-        /*
-        for(int counter = 0; counter < numBodies;counter++){
-            // the position to calc = position + kv3*dt
-            Vector3D kvTimesDt = Vector3D.multiply(kv[2][counter],dt); // multiply kv3 by dt
-            Vector3D ksTimesDt = Vector3D.multiply(ks[2][counter],dt);// ks3 * dt
-            ks[3][counter] = Vector3D.add(positions[counter],kvTimesDt); // position + kv * dt
-
-            // kv4 = v + ks3 * dt
-
-            kv[3][counter] = Vector3D.add(kv[2][counter],ksTimesDt); // v + (ks3 * dt)
-        }
-
-         */
 
         // use kv and ks to predict new position and velocity
 
         int counter = 0;
         Vector3D[] sumOfDisplacementCoefficients = new Vector3D[numBodies];
         Vector3D[] sumOfVelocityCoefficients = new Vector3D[numBodies];
+
+        // apply correct multipliers:
+        ks[1] = Vector3DArrayOperations.multiplyVectors(ks[1], 2);
+        ks[2] = Vector3DArrayOperations.multiplyVectors(ks[2], 2);
+
+        kv[1] = Vector3DArrayOperations.multiplyVectors(kv[1], 2);
+        kv[2] = Vector3DArrayOperations.multiplyVectors(kv[2], 2);
         for(Body body : bodies){
-            // apply correct multipliers:
-
-            ks[1][counter] = Vector3D.multiply(ks[1][counter],2);
-            ks[2][counter] = Vector3D.multiply(ks[2][counter],2);
-
-            kv[1][counter] = Vector3D.multiply(kv[1][counter],2);
-            kv[2][counter] = Vector3D.multiply(kv[2][counter],2);
-
-
-
             //get dt/6 * ks1+2ks2+2ks3+ks4
             sumOfDisplacementCoefficients[counter]= Vector3D.add(Vector3D.add(Vector3D.add(ks[0][counter], ks[1][counter]),ks[2][counter]),ks[3][counter]);
             sumOfDisplacementCoefficients[counter] = Vector3D.multiply(sumOfDisplacementCoefficients[counter], dt/6);
