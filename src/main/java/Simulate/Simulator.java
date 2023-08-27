@@ -48,7 +48,7 @@ public class Simulator {        //will not let me set it to static???
 
         //test data
         ArrayList<Body> bodies = new ArrayList<>();
-        Body earth = new Body(0,0,63712000,0,0,0,"earth",6e24,6371000, true);
+        Body earth = new Body(0,0,63712000,100,0,0,"earth",6e24,6371000, true);
 
         bodies.add(earth);
 

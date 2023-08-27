@@ -27,6 +27,8 @@ public class HelloApplication extends Application {
 
     private static final double mouseSens = 0.1f;
 
+    private double timeElapsed = 0;
+
     private static long time;
     private static double camSpeed = 1e7;
     private static double dtMultiplier = 1e-3;
@@ -151,9 +153,11 @@ public class HelloApplication extends Application {
                     time = l;
                     deltaTime = 0;
                 }
+                timeElapsed += deltaTime * dtMultiplier;
+                System.out.println(timeElapsed);
                 Simulator.updateBodies(deltaTime/1e7*dtMultiplier);
                 time = l;
-                // now we need to update the spheres (oh god)
+                // now we need to update the spheres
                 int counter =0;
                 for(Sphere sphere : spheres){
                     Vector3D bodyPos = bodies.get(counter).getPosition();
@@ -164,8 +168,8 @@ public class HelloApplication extends Application {
                     counter++;
                 }
 
-                System.out.println("velocity = " + bodies.get(0).getVelocity());
-                System.out.println("position = " + bodies.get(0).getPosition());
+               // System.out.println("velocity = " + bodies.get(0).getVelocity());
+               // System.out.println("position = " + bodies.get(0).getPosition());
             }
         };
         timer.start();
