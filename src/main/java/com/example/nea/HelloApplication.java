@@ -187,7 +187,10 @@ public class HelloApplication extends Application {
                 while(bodies.size() < spheres.size()){
                     //a collision has occured
                     System.out.println("bodies is size "+bodies.size()+" removing 1 from spheres as it is size "+spheres.size());
-                    spheres.remove(0);
+                    spheres.remove(spheres.size()-1);
+                  //  spheres.add(new Sphere(1));
+                 //   group.getChildren().add(spheres.get(spheres.size()-1));
+                    group.getChildren().remove(spheres.size()-1);
                 }
                 //update remaining spheres
                 int counter =0;
@@ -201,10 +204,14 @@ public class HelloApplication extends Application {
                     sphere.setTranslateX(bodyPos.getComponent(0)*everythingMultiplier);
                     sphere.setTranslateY(bodyPos.getComponent(1)*-everythingMultiplier);
                     sphere.setTranslateZ(bodyPos.getComponent(2)*everythingMultiplier);
-                    System.out.println(sphere.getTranslateX() + ", "+ sphere.getTranslateY() + ", " + sphere.getTranslateZ());
                     counter++;
-                    System.out.println(" ");
                 }
+                    System.out.println(" ");
+
+                for (Sphere sphere : spheres){
+                    System.out.println(sphere.getTranslateX() + ", "+ sphere.getTranslateY() + ", " + sphere.getTranslateZ());
+                }
+                    System.out.println(" ");
             }catch (Exception e){
                     System.out.println(bodies.size() + " " + spheres.size());
                     throw new RuntimeException(e);

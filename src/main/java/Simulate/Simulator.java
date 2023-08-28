@@ -58,19 +58,19 @@ public class Simulator {        //will not let me set it to static???
         //test data
         ArrayList<Body> bodies = new ArrayList<>();
 
-        Body earth = new Body(0,0,6372000,0,0,0,"earth",6e24,6371000, true);
-        Body earth2 = new Body(0,0,-6372000,0,0,0,"htrae",6e24,6371000, true);
-        Body earth3 = new Body(6e99,0,0,1e3,0,0,"3",6e21,637100, true);
-    //    Body earth4 = new Body(-63712000,0,0,-1e3,0,0,"4",6e24,6371000, true);
+        Body earth = new Body(0,0,6371000,0,0,0,"1",6e24,6371000, true);
+        Body earth2 = new Body(0,0,-6372000,0,0,0,"2",6e24,6371000, true);
+        Body earth3 = new Body(1e8,0,0,1e3,0,0,"3",6e21,637100, true);
+        Body earth4 = new Body(-63712000,0,0,-1e3,0,0,"4",6e24,6371000, true);
         earth.setSimulationID(0);
         earth2.setSimulationID(1);
         earth3.setSimulationID(2);
-    //    earth4.setSimulationID(3);
+        earth4.setSimulationID(3);
 
         bodies.add(earth);
         bodies.add(earth2);
         bodies.add(earth3);
-      //  bodies.add(earth4);
+        bodies.add(earth4);
 
 
         /*
@@ -309,7 +309,7 @@ public class Simulator {        //will not let me set it to static???
         // they aren't colliding
 
      //   int currentBody = 0;//  start at the first body
-        for(int currentBody = 0;currentBody < bodies.size();currentBody++){ // for each body
+        for(int currentBody = 0;currentBody < bodies.size();currentBody++){ // for each body    //remember to talk about why did this with that odd error
             Body body = bodies.get(currentBody);
             for(int iterator = currentBody+1;iterator < bodies.size();iterator++){// from the next body to the end:
                 Body otherBody = bodies.get(iterator);
@@ -322,7 +322,7 @@ public class Simulator {        //will not let me set it to static???
                 if(dist <= sumOfRadii){
                     //then a collision has occured
                     // the result of the collision will depend on velocity and mass of the planet
-                    System.out.println("collision between "+body.getName()+" and "+otherBody.getName());
+                    System.out.println("COLLISION between "+body.getName()+" and "+otherBody.getName());
 
                     //Rnew = cube root(R1^3 + R2^3)
                     double newRadius = Math.pow((Math.pow(body.getRadius(),3) + Math.pow(otherBody.getRadius(),3)),0.333d);
@@ -356,8 +356,14 @@ public class Simulator {        //will not let me set it to static???
 
                     System.out.println(newRadius + " " + newBody);
                     bodies.remove(iterator);
+                    System.out.println("removed"+otherBody);
                     bodies.remove(currentBody);
+                    System.out.println("removed "+body);
                     bodies.add(newBody);
+                    System.out.println("added "+newBody);
+
+                    currentBody = bodies.size(); //end the loop so that no more collisions occur given that bodies has changed
+                    iterator = bodies.size();
                 }
 
             }
