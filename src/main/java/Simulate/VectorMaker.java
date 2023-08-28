@@ -23,17 +23,30 @@ public class VectorMaker {
          */
 
         //Body earth = new Body(0,0,0,0,0,0,"Earth",5.97e24,10);
-        Body moon = new Body(1000,0,0,0,0,0, "Moon",6.24e21,10, true);
-        Body otherBody = new Body(-1000,0,0,0,0,0,"otherBody",6.24e21,10, true);
+       // Body moon = new Body(1000,0,0,0,0,0, "Moon",6.24e21,1000, true);
+   //     Body otherBody = new Body(-1000,0,0,0,0,0,"otherBody",6.24e21,1040, true);
+      //  Simulator.startUp(3);
 
-        ArrayList<Body> bodies = new ArrayList<>();
+  //      ArrayList<Body> bodies = new ArrayList<>();
        // bodies.add(earth);
-        bodies.add(moon);
-        bodies.add(otherBody);
+      //  bodies.add(moon);
+     //   bodies.add(otherBody);
+
+        Simulator.startUp(3);
+        for(Body body : Simulator.getBodies()){
+            System.out.println(body);
+        }
 
 
+
+
+        Simulator.checkCollisions();
+        for(Body body : Simulator.getBodies()){
+            System.out.println(body);
+        }
         for(int counter = 0;counter < 100;counter++){
-            PlanetSystem.RK4(bodies, 0.01f);
+          //  PlanetSystem.RK4(bodies, 0.01f);
+
         }
 
     }

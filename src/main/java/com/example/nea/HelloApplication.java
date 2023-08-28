@@ -58,6 +58,9 @@ public class HelloApplication extends Application {
                 followBody = body;
             }
         }
+        //Vector3D rotAxis = Vector3D.getDirection(followBody.getPosition(),new Vector3D(cam.getTranslateX(), cam.getTranslateY(), cam.getTranslateZ()));
+       // cam.setRotationAxis(new Point3D(rotAxis.getComponent(0),rotAxis.getComponent(1),rotAxis.getComponent(2)));
+       // cam.setRotate(0);
 
         following = true;
         //reset all translations
@@ -99,7 +102,7 @@ public class HelloApplication extends Application {
         cam = new PerspectiveCamera(true);                       //  instantiating a camera with the correct properties
         cam.setNearClip(0.01f);
         cam.setFarClip(1e100);
-        cam.setFieldOfView(100);
+        cam.setFieldOfView(90);
 
       //  cam.translateZProperty().set(cam.getTranslateZ() -100);     //  moving the camera back
         scene.setFill(Paint.valueOf("black"));
@@ -175,24 +178,36 @@ public class HelloApplication extends Application {
                 lastTime = nanoTime;
 
                 deltaTime *= dtMultiplier / 1e9;
-                System.out.println(deltaTime);
+               // System.out.println(deltaTime);
 
                 Simulator.updateBodies(deltaTime);
                 // now we need to update the spheres
 
                 //in case any bodies have been removed (collisions):
                 while(bodies.size() < spheres.size()){
+                    //a collision has occured
+                    System.out.println("bodies is size "+bodies.size()+" removing 1 from spheres as it is size "+spheres.size());
                     spheres.remove(0);
                 }
                 //update remaining spheres
                 int counter =0;
-                for(Sphere sphere : spheres){
-                    Vector3D bodyPos = bodies.get(counter).getPosition();
+                try{
+                for(Body body : bodies){
+                    System.out.println(body.getName()+ " " + body.getPosition());
+                    Vector3D bodyPos = body.getPosition();
+                    Sphere sphere = spheres.get(counter);
                    // System.out.println(bodyPos);
+                    sphere.setRadius(body.getRadius()*everythingMultiplier);
                     sphere.setTranslateX(bodyPos.getComponent(0)*everythingMultiplier);
                     sphere.setTranslateY(bodyPos.getComponent(1)*-everythingMultiplier);
                     sphere.setTranslateZ(bodyPos.getComponent(2)*everythingMultiplier);
+                    System.out.println(sphere.getTranslateX() + ", "+ sphere.getTranslateY() + ", " + sphere.getTranslateZ());
                     counter++;
+                    System.out.println(" ");
+                }
+            }catch (Exception e){
+                    System.out.println(bodies.size() + " " + spheres.size());
+                    throw new RuntimeException(e);
                 }
 
                 translateCam();
@@ -230,8 +245,6 @@ public class HelloApplication extends Application {
         Vector3D followPos = new Vector3D(0,0,0);
         if(following) {
             followPos = Vector3D.multiply(followBody.getPosition(),everythingMultiplier);
-
-
         }
         cam.setTranslateX(followPos.getComponent(0) + camLocalXpos);
         cam.setTranslateY(-followPos.getComponent(1) + camLocalYpos);

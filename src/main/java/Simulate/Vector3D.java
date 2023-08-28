@@ -176,4 +176,11 @@ public class Vector3D {
         String ref = getComponent(0)+","+getComponent(1)+","+getComponent(2);
         return ref;
     }
+    public static Vector3D getDirection(Vector3D to, Vector3D from){
+        to = nullTo0(from);
+        from = nullTo0(from);
+
+        Vector3D returnVector = Vector3D.add(to,Vector3D.multiply(from,-1));
+        return Vector3D.getUnitVector(returnVector);
+    }
 }
