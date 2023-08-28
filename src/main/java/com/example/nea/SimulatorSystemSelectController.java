@@ -1,5 +1,6 @@
 package com.example.nea;
 
+import Simulate.FileOperations;
 import Simulate.Simulator;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -46,7 +47,8 @@ public class SimulatorSystemSelectController implements Initializable {
             //send System selected to the correct place
 
             //open interloper select
-
+            FileOperations fileOps = new FileOperations();
+            Simulator.setFileOps(fileOps);
             Simulator.startUp(currentlySelectedItem);
 
             root = FXMLLoader.load(getClass().getResource("InterloperTypeSelect.fxml"));

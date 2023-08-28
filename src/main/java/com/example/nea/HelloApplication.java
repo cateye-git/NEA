@@ -1,7 +1,6 @@
 package com.example.nea;
 
 import Simulate.Body;
-import Simulate.FileOperations;
 import Simulate.Simulator;
 import Simulate.Vector3D;
 import javafx.animation.AnimationTimer;
@@ -27,27 +26,31 @@ public class HelloApplication extends Application {
 
     private static final double everythingMultiplier = 1e-5f;
 
-    private static final int screenWidth = 1400;        //  setting the width of the window
-    private static final int screenHeight = 1000;       //  setting the height of the window
+    private final int screenWidth = 1400;        //  setting the width of the window
+    private final int screenHeight = 1000;       //  setting the height of the window
 
-    private static final double mouseSens = 0.1f;
-    private static double camSpeed = 1e6*everythingMultiplier;
-    private static double dtMultiplier = 1;
+    private final double fileWriteInterval = 60;
+    private double timeElapsed = 0;
+    private double timeElapsedSinceLastFileWrite = 0;
 
-    private static boolean following = false;
+    private final double mouseSens = 0.1f;
+    private double camSpeed = 1e6*everythingMultiplier;
+    private double dtMultiplier = 1;
+
+    private boolean following = false;
     private Body followBody;
-    private LocalDateTime lastTime;
+    private LocalDateTime lastTime = LocalDateTime.now();
 
     private PerspectiveCamera cam;
     private double camLocalXpos = 0;
     private double camLocalYpos = 0;
     private double camLocalZpos = 0;
 
-    private static double mouseX;
-    private static double mouseY;
+    private double mouseX;
+    private double mouseY;
 
 
-    private static ArrayList<Body> bodies;
+    private ArrayList<Body> bodies;
 
     public void getNewFollowPos(int id){
 
@@ -73,11 +76,12 @@ public class HelloApplication extends Application {
         translateCam();
     }
 
-    public void runThing(Stage primaryStage, FileOperations fileOps) throws IOException{
+    public void runThing(Stage primaryStage) throws IOException{
 
         bodies = Simulator.getBodies();
         Group group = new Group();
 
+        //impors spheres as bodies
         ArrayList<Sphere> spheres = new ArrayList<>();
         for(Body body : bodies){
             Sphere sphere = new Sphere(0);
@@ -164,9 +168,9 @@ public class HelloApplication extends Application {
 
         AnimationTimer timer = new AnimationTimer() {
             @Override
-            public void handle(long l) {
+            public void handle(long timeStamp) {
 
-                double nanoTime = Duration.between(lastTime, LocalDateTime.now()).getNano(); //gets the nanoseconds part of the time between now and the epoch
+                double nanoTime = Duration.between(lastTime, LocalDateTime.now()).getNano(); //gets the nanoseconds part of the time between now and last time
                 /*
                 if(nanoTime < 0){
                     deltaTime += 1e9; //so if it goes from say 0.9 secs to 0.1, the dt will be
@@ -179,8 +183,14 @@ public class HelloApplication extends Application {
                  */
 
                 lastTime = LocalDateTime.now();
-
                 nanoTime *= dtMultiplier / 1e9;
+                timeElapsed += nanoTime;
+                timeElapsedSinceLastFileWrite += nanoTime;
+                if(timeElapsedSinceLastFileWrite >= fileWriteInterval){
+                    timeElapsedSinceLastFileWrite -= fileWriteInterval;
+                    Simulator.writeSnapshot(timeElapsed);
+                }
+
                // System.out.println(deltaTime);
 
                 Simulator.updateBodies(nanoTime);
@@ -208,7 +218,7 @@ public class HelloApplication extends Application {
                     }
                     int counter = 0;
                     for(Body body: bodies){
-                        System.out.println("ADD sphere to get to "+bodies.size()+ " from " + spheres.size());
+                      //  System.out.println("ADD sphere to get to "+bodies.size()+ " from " + spheres.size());
                         spheres.add(new Sphere());
                         group.getChildren().add(spheres.get(counter));
                         counter++;
@@ -218,7 +228,7 @@ public class HelloApplication extends Application {
                 int counter =0;
                 try{
                 for(Body body : bodies){
-                    System.out.println(body.getName()+ " " + body.getPosition());
+                //    System.out.println(body.getName()+ " " + body.getPosition());
                     Vector3D bodyPos = body.getPosition();
                     Sphere sphere = spheres.get(counter);
                    // System.out.println(bodyPos);
@@ -228,12 +238,12 @@ public class HelloApplication extends Application {
                     sphere.setTranslateZ(bodyPos.getComponent(2)*everythingMultiplier);
                     counter++;
                 }
-                    System.out.println(" ");
+       //             System.out.println(" ");
 
                 for (Sphere sphere : spheres){
-                    System.out.println(sphere.getTranslateX() + ", "+ sphere.getTranslateY() + ", " + sphere.getTranslateZ());
+              //      System.out.println(sphere.getTranslateX() + ", "+ sphere.getTranslateY() + ", " + sphere.getTranslateZ());
                 }
-                    System.out.println(" ");
+                //    System.out.println(" ");
             }catch (Exception e){
                     System.out.println(bodies.size() + " " + spheres.size());
                     throw new RuntimeException(e);
@@ -258,7 +268,7 @@ public class HelloApplication extends Application {
   @Override
    public void start(Stage primaryStage) throws IOException {
        Stage stage = new Stage();
-        //runThing(stage, FileOp);
+        //runThing(stage);
     }
 
     public static void main(String[] args) {

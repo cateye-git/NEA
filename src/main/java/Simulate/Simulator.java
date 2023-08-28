@@ -30,20 +30,24 @@ public class Simulator {        //will not let me set it to static???
 
     public static void startUp(int id){
         sysID = id;
-        originalBodies = getSystemData(sysID);
-        bodies = getSystemData(sysID);
+        originalBodies = getSystemData();
+        bodies = getSystemData();
+        fileOps.openOutputFileHandle(getSystemName());
     }
 
     public static void setInterloper(Body inte) {
         // this is called by the GUI when an interloper is selected
         interloper = inte;
+        fileOps.writeFirstLine(true, sysID,getSystemName());
     }
     public static void setRandomInterloper(){
         //when the user asks for no interloper
         interloper = getRandomInterloper(bodies);
+        fileOps.writeFirstLine(true, sysID,getSystemName());
     }
     public static void noInterloper(){
         isInterloper = false;
+        fileOps.writeFirstLine(false, sysID,getSystemName());
     }
 
     public static ArrayList<Body> getBodies(){
@@ -56,17 +60,17 @@ public class Simulator {        //will not let me set it to static???
     }
 
 
-    private static ArrayList<Body> getSystemData(int systemID){
+    public static ArrayList<Body> getSystemData(){
 
         //select all bodies from the required system, name is done in separate subroutine
 
         //test data
         ArrayList<Body> bodies = new ArrayList<>();
 
-        Body earth = new Body(0,9e8,7382000,0,0,0,"1",6e24,6371000, true);
-        Body earth2 = new Body(0,9e8,-6382000,-100000,0,0,"2",6e24,6371000, true);
-        Body earth3 = new Body(83820000,9e8,0,0,0,0,"3",6e23,537100, true);
-        Body earth4 = new Body(-6e9,9e8,0,1000,0,0,"4",6e25,63740000, true);
+        Body earth = new Body(0,9e8,7382000,0,0,0,"body1",6e24,6371000, true);
+        Body earth2 = new Body(0,9e8,-6382000,-100000,0,0,"body2",6e24,6371000, true);
+        Body earth3 = new Body(83820000,9e8,0,0,0,0,"body3",6e23,537100, true);
+        Body earth4 = new Body(-6e9,9e8,0,1000,0,0,"body4",6e25,63740000, true);
         earth.setSimulationID(0);
         earth2.setSimulationID(1);
         earth3.setSimulationID(2);
@@ -91,11 +95,18 @@ public class Simulator {        //will not let me set it to static???
 
         return bodies;
     }
-    private static String getSystemName(){
+    public static String getSystemName(){
 
         //get the name of the system with this ID from the database for storing to the CSV file
 
         return "testSystem";
+    }
+
+    public static void writeSnapshot(double time){
+        fileOps.writeSnapshot(time,bodies);
+    }
+    public static void endSimulation(){
+        fileOps.closeOutputFileHandle();
     }
 
 

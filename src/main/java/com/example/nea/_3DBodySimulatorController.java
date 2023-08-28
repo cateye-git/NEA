@@ -26,16 +26,19 @@ public class _3DBodySimulatorController implements Initializable {
     @FXML
     private ComboBox<Body> selectBody;
 
+    public void closeSim(ActionEvent event){
+        Simulator.endSimulation();
+    }
+
     HelloApplication hi;
 
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle){ //called when the scene is initialised
-        FileOperations fileOps = new FileOperations();
         Stage stage = new Stage();
         hi = new HelloApplication();
         try {
-            hi.runThing(stage, fileOps);
+            hi.runThing(stage);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -44,6 +47,7 @@ public class _3DBodySimulatorController implements Initializable {
         }
         selectBody.setOnAction(this::selectBodyToFollow);
         selectBody.setOnMousePressed(this::updateBodies);
+        selectBody.setValue(Simulator.getBodies().get(0));
     }
 
     private void updateBodies(MouseEvent mouseEvent) {
