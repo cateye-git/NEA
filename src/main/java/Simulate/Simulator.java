@@ -38,11 +38,13 @@ public class Simulator {        //will not let me set it to static???
     public static void setInterloper(Body inte) {
         // this is called by the GUI when an interloper is selected
         interloper = inte;
+        bodies.add(interloper);
         fileOps.writeFirstLine(true, sysID,getSystemName());
     }
     public static void setRandomInterloper(){
         //when the user asks for no interloper
         interloper = getRandomInterloper(bodies);
+        bodies.add(interloper);
         fileOps.writeFirstLine(true, sysID,getSystemName());
     }
     public static void noInterloper(){
@@ -54,9 +56,9 @@ public class Simulator {        //will not let me set it to static???
         return bodies;
     }
 
-    public static void updateBodies(double dt){
+    public static void updateBodies(double dt, double time){
         RK4(dt);
-        checkCollisions();
+        checkCollisions(time);
     }
 
 
@@ -68,7 +70,7 @@ public class Simulator {        //will not let me set it to static???
         ArrayList<Body> bodies = new ArrayList<>();
 
         Body earth = new Body(0,9e8,7382000,0,0,0,"body1",6e24,6371000, true);
-        Body earth2 = new Body(0,9e8,-6382000,-100000,0,0,"body2",6e24,6371000, true);
+        Body earth2 = new Body(0,9e8,-6382000,-1000,0,0,"body2",6e24,6371000, true);
         Body earth3 = new Body(83820000,9e8,0,0,0,0,"body3",6e23,537100, true);
         Body earth4 = new Body(-6e9,9e8,0,1000,0,0,"body4",6e25,63740000, true);
         earth.setSimulationID(0);
@@ -315,7 +317,7 @@ public class Simulator {        //will not let me set it to static???
         }
     }
 
-    public static void checkCollisions(){                                           //!!! TURN TO PRIVATE
+    public static void checkCollisions(double time){                                           //!!! TURN TO PRIVATE
         // given that we can treat all bodies as spheres, the easiest way to check for any collisions is to look at
         // whether the distance between any two planets is less than the sum of their radii.
         // if so, a collision has occured
@@ -342,10 +344,10 @@ public class Simulator {        //will not let me set it to static???
 
                     //Rnew = cube root(R1^3 + R2^3)
                     double newRadius = Math.pow((Math.pow(body.getRadius(),3) + Math.pow(otherBody.getRadius(),3)),0.333d);
-                    System.out.println("r1 = "+body.getRadius()+" r2 = "+otherBody.getRadius()+" so rNew = "+newRadius);
+               //     System.out.println("r1 = "+body.getRadius()+" r2 = "+otherBody.getRadius()+" so rNew = "+newRadius);
                     //Mnew = m1 + m2
                     double newMass = body.getMass() + otherBody.getMass();
-                    System.out.println("m1 = "+body.getMass()+" m2 = "+otherBody.getMass()+" so mNew = "+newMass);
+                 //   System.out.println("m1 = "+body.getMass()+" m2 = "+otherBody.getMass()+" so mNew = "+newMass);
 
                     //get momentum of old bodies
                     Vector3D momentumCurrent = Vector3D.multiply(body.getVelocity(),body.getMass());
@@ -370,13 +372,15 @@ public class Simulator {        //will not let me set it to static???
                     Body newBody = new Body(newPos, Vnew, "collision between "+body.getName()+" and "+otherBody.getName(), newMass, newRadius, true);
                     newBody.setSimulationID(getNewSimID());
 
-                    System.out.println(newRadius + " " + newBody);
+               //     System.out.println(newRadius + " " + newBody);
                     bodies.remove(iterator);
-                    System.out.println("removed"+otherBody);
+               //     System.out.println("removed"+otherBody);
                     bodies.remove(currentBody);
-                    System.out.println("removed "+body);
+                //    System.out.println("removed "+body);
                     bodies.add(newBody);
-                    System.out.println("added "+newBody);
+                //    System.out.println("added "+newBody);
+
+                    fileOps.writeCollision(time, body, otherBody);
 
                     currentBody = bodies.size(); //end the loop so that no more collisions occur given that bodies has changed
                     iterator = bodies.size();

@@ -5,6 +5,7 @@ import Simulate.Simulator;
 import Simulate.Vector3D;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Point3D;
 import javafx.scene.Camera;
 import javafx.scene.Group;
@@ -51,7 +52,13 @@ public class HelloApplication extends Application {
 
 
     private ArrayList<Body> bodies;
+    private Stage myStage;
 
+    public void stopAll(){
+        //Platform.exit();
+        // do what you have to do
+        myStage.close();
+    }
     public void getNewFollowPos(int id){
 
         //find body with this ID
@@ -77,6 +84,7 @@ public class HelloApplication extends Application {
     }
 
     public void runThing(Stage primaryStage) throws IOException{
+        myStage = primaryStage;
 
         bodies = Simulator.getBodies();
         Group group = new Group();
@@ -187,13 +195,17 @@ public class HelloApplication extends Application {
                 timeElapsed += nanoTime;
                 timeElapsedSinceLastFileWrite += nanoTime;
                 if(timeElapsedSinceLastFileWrite >= fileWriteInterval){
-                    timeElapsedSinceLastFileWrite -= fileWriteInterval;
+                    System.out.println("printing to file now!");
+                    while(timeElapsedSinceLastFileWrite >= fileWriteInterval) {
+                        timeElapsedSinceLastFileWrite -= fileWriteInterval;
+                    }
                     Simulator.writeSnapshot(timeElapsed);
                 }
+              //  System.out.println(timeElapsed);
 
                // System.out.println(deltaTime);
 
-                Simulator.updateBodies(nanoTime);
+                Simulator.updateBodies(nanoTime, timeElapsed);
                 // now we need to update the spheres
 
                 //in case any bodies have been removed (collisions):
@@ -219,7 +231,7 @@ public class HelloApplication extends Application {
                     int counter = 0;
                     for(Body body: bodies){
                       //  System.out.println("ADD sphere to get to "+bodies.size()+ " from " + spheres.size());
-                        spheres.add(new Sphere());
+                        spheres.add(new Sphere(body.getRadius()));
                         group.getChildren().add(spheres.get(counter));
                         counter++;
                     }
@@ -239,10 +251,6 @@ public class HelloApplication extends Application {
                     counter++;
                 }
        //             System.out.println(" ");
-
-                for (Sphere sphere : spheres){
-              //      System.out.println(sphere.getTranslateX() + ", "+ sphere.getTranslateY() + ", " + sphere.getTranslateZ());
-                }
                 //    System.out.println(" ");
             }catch (Exception e){
                     System.out.println(bodies.size() + " " + spheres.size());
@@ -266,7 +274,7 @@ public class HelloApplication extends Application {
     }
 
   @Override
-   public void start(Stage primaryStage) throws IOException {
+   public void start(Stage primaryStage) {
        Stage stage = new Stage();
         //runThing(stage);
     }

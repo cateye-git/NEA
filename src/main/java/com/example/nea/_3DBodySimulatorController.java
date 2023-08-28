@@ -1,20 +1,13 @@
 package com.example.nea;
 
 import Simulate.Body;
-import Simulate.FileOperations;
 import Simulate.Simulator;
-import Simulate.Vector3D;
-import javafx.animation.AnimationTimer;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Sphere;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -26,11 +19,12 @@ public class _3DBodySimulatorController implements Initializable {
     @FXML
     private ComboBox<Body> selectBody;
 
-    public void closeSim(ActionEvent event){
-        Simulator.endSimulation();
-    }
-
     HelloApplication hi;
+
+    public void closeSim(ActionEvent event) throws Exception {
+        Simulator.endSimulation();
+        hi.stopAll();
+    }
 
 
     @Override
@@ -59,7 +53,14 @@ public class _3DBodySimulatorController implements Initializable {
 
     private void selectBodyToFollow(ActionEvent event){
         //update items in selection box
-        int id = selectBody.getValue().getSimulationID();
+        int id;
+        try {
+            id = selectBody.getValue().getSimulationID();
+        }catch (Exception e){
+            // cannot get the value because the ID does not exist.
+            id = Simulator.getBodies().get(0).getSimulationID();
+            //so get the first body.
+        }
         //Simulator.getBodies().indexOf(body);
         hi.getNewFollowPos(id);
     }

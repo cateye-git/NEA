@@ -12,6 +12,6 @@
             <Font size="18.0" />
          </font>
       </Label>
-      <Button layoutX="150.0" layoutY="358.0" mnemonicParsing="false" text="Exit Simulation" />
+      <Button layoutX="14.0" layoutY="358.0" mnemonicParsing="false" onAction="#closeSim" text="Exit Simulation" />
    </children>
 </AnchorPane>
