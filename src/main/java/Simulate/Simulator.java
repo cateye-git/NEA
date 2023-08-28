@@ -58,10 +58,10 @@ public class Simulator {        //will not let me set it to static???
         //test data
         ArrayList<Body> bodies = new ArrayList<>();
 
-        Body earth = new Body(0,0,6371000,0,0,0,"1",6e24,6371000, true);
-        Body earth2 = new Body(0,0,-6372000,0,0,0,"2",6e24,6371000, true);
-        Body earth3 = new Body(1e8,0,0,1e3,0,0,"3",6e21,637100, true);
-        Body earth4 = new Body(-63712000,0,0,-1e3,0,0,"4",6e24,6371000, true);
+        Body earth = new Body(0,9e8,7382000,0,0,0,"1",6e24,6371000, true);
+        Body earth2 = new Body(0,9e8,-6382000,-100000,0,0,"2",6e24,6371000, true);
+        Body earth3 = new Body(83820000,9e8,0,0,0,0,"3",6e23,537100, true);
+        Body earth4 = new Body(-6e9,9e8,0,1000,0,0,"4",6e25,63740000, true);
         earth.setSimulationID(0);
         earth2.setSimulationID(1);
         earth3.setSimulationID(2);

@@ -66,7 +66,7 @@ public class HelloApplication extends Application {
         //reset all translations
         camLocalXpos = 0;
         camLocalYpos = 0;
-        camLocalZpos = -1e8*everythingMultiplier;
+        camLocalZpos = -followBody.getRadius()*3*everythingMultiplier;
 
         //set all translations relative to this body
         translateCam();
@@ -184,6 +184,7 @@ public class HelloApplication extends Application {
                 // now we need to update the spheres
 
                 //in case any bodies have been removed (collisions):
+                /*
                 while(bodies.size() < spheres.size()){
                     //a collision has occured
                     System.out.println("bodies is size "+bodies.size()+" removing 1 from spheres as it is size "+spheres.size());
@@ -191,6 +192,24 @@ public class HelloApplication extends Application {
                   //  spheres.add(new Sphere(1));
                  //   group.getChildren().add(spheres.get(spheres.size()-1));
                     group.getChildren().remove(spheres.size()-1);
+                }
+
+
+                 */
+                //if there's a discrepancy, remove em all and add some new!
+
+                if(bodies.size() != spheres.size()){
+                    while(spheres.size() > 0){
+                        group.getChildren().remove(spheres.get((0)));
+                        spheres.remove(0);
+                    }
+                    int counter = 0;
+                    for(Body body: bodies){
+                        System.out.println("ADD sphere to get to "+bodies.size()+ " from " + spheres.size());
+                        spheres.add(new Sphere());
+                        group.getChildren().add(spheres.get(counter));
+                        counter++;
+                    }
                 }
                 //update remaining spheres
                 int counter =0;
