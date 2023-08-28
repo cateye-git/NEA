@@ -18,9 +18,14 @@ public class Simulator {        //will not let me set it to static???
     private static Body interloper;
     private static boolean isInterloper = true;
 
+    private static FileOperations fileOps;
+
     private static int getNewSimID(){
         simulationID++;
         return simulationID;
+    }
+    public static void setFileOps(FileOperations fileOperations){
+        fileOps = fileOperations;
     }
 
     public static void startUp(int id){

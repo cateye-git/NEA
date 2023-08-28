@@ -1,6 +1,7 @@
 package com.example.nea;
 
 import Simulate.Body;
+import Simulate.FileOperations;
 import Simulate.Simulator;
 import Simulate.Vector3D;
 import javafx.animation.AnimationTimer;
@@ -30,12 +31,11 @@ public class _3DBodySimulatorController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle){ //called when the scene is initialised
-
-
+        FileOperations fileOps = new FileOperations();
         Stage stage = new Stage();
         hi = new HelloApplication();
         try {
-            hi.runThing(stage);
+            hi.runThing(stage, fileOps);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

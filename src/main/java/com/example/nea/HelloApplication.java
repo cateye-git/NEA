@@ -1,6 +1,7 @@
 package com.example.nea;
 
 import Simulate.Body;
+import Simulate.FileOperations;
 import Simulate.Simulator;
 import Simulate.Vector3D;
 import javafx.animation.AnimationTimer;
@@ -35,7 +36,7 @@ public class HelloApplication extends Application {
 
     private static boolean following = false;
     private Body followBody;
-    private double lastTime;
+    private LocalDateTime lastTime;
 
     private PerspectiveCamera cam;
     private double camLocalXpos = 0;
@@ -72,7 +73,7 @@ public class HelloApplication extends Application {
         translateCam();
     }
 
-    public void runThing(Stage primaryStage) throws IOException{
+    public void runThing(Stage primaryStage, FileOperations fileOps) throws IOException{
 
         bodies = Simulator.getBodies();
         Group group = new Group();
@@ -165,9 +166,9 @@ public class HelloApplication extends Application {
             @Override
             public void handle(long l) {
 
-                double nanoTime = Duration.between(LocalDateTime.MIN, LocalDateTime.now()).getNano(); //gets the nanoseconds part of the time between now and the epoch
-                double deltaTime = nanoTime - lastTime;
-                if(deltaTime < 0){
+                double nanoTime = Duration.between(lastTime, LocalDateTime.now()).getNano(); //gets the nanoseconds part of the time between now and the epoch
+                /*
+                if(nanoTime < 0){
                     deltaTime += 1e9; //so if it goes from say 0.9 secs to 0.1, the dt will be
                     //          0.1-0.9 = -0.8
                     //          so we add 1 to it to get 0.2 which is the true time elapsed
@@ -175,12 +176,14 @@ public class HelloApplication extends Application {
                     //          too slowly anyway, so is not a valuable thing to consider
                 }
 
-                lastTime = nanoTime;
+                 */
 
-                deltaTime *= dtMultiplier / 1e9;
+                lastTime = LocalDateTime.now();
+
+                nanoTime *= dtMultiplier / 1e9;
                // System.out.println(deltaTime);
 
-                Simulator.updateBodies(deltaTime);
+                Simulator.updateBodies(nanoTime);
                 // now we need to update the spheres
 
                 //in case any bodies have been removed (collisions):
@@ -255,7 +258,7 @@ public class HelloApplication extends Application {
   @Override
    public void start(Stage primaryStage) throws IOException {
        Stage stage = new Stage();
-        runThing(stage);
+        //runThing(stage, FileOp);
     }
 
     public static void main(String[] args) {
