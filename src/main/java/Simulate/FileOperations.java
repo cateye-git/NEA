@@ -87,7 +87,7 @@ public class FileOperations {
         }
         ref += sysName + "," + systemID + "..";// adds the rest of the needed data to the file
         try {// tries to write it
-            writer.write(ref);
+            writer.write(ref + "\n");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

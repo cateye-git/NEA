@@ -6,9 +6,9 @@
 
 <AnchorPane prefHeight="650.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.nea.CreatorSystemSelectController">
     <children>
-        <ListView fx:id="SelectSystemForSim" fixedCellSize="50.0" layoutX="372.0" layoutY="147.0" prefHeight="492.0" prefWidth="536.0" />
+        <ListView fx:id="SelectSystemForSim" fixedCellSize="50.0" layoutX="372.0" layoutY="26.0" prefHeight="613.0" prefWidth="617.0" />
         <Button layoutX="14.0" layoutY="150.0" mnemonicParsing="false" onAction="#addNew" prefHeight="90.0" prefWidth="350.0" text="Add new" />
-        <Label layoutX="386.0" layoutY="45.0" prefHeight="62.0" prefWidth="227.0" text="Creator tool" textFill="WHITE">
+        <Label layoutX="75.0" layoutY="64.0" prefHeight="62.0" prefWidth="227.0" text="Creator tool" textFill="WHITE">
             <font>
                 <Font size="40.0" />
             </font>
@@ -17,6 +17,5 @@
         <Button layoutX="14.0" layoutY="350.0" mnemonicParsing="false" onAction="#deleteSelected" prefHeight="90.0" prefWidth="350.0" text="Delete" />
         <Button layoutX="14.0" layoutY="450.0" mnemonicParsing="false" onAction="#copySelected" prefHeight="90.0" prefWidth="350.0" text="Copy" />
         <Button layoutX="14.0" layoutY="550.0" mnemonicParsing="false" onAction="#onMainMenuClick" prefHeight="90.0" prefWidth="350.0" text="Main menu" />
-        <Label fx:id="errorLabel" layoutX="372.0" layoutY="95.0" prefHeight="62.0" prefWidth="862.0" />
     </children>
 </AnchorPane>

@@ -14,9 +14,11 @@ public class Simulator {        //will not let me set it to static???
     private static int simulationID = 0;
 
     private static ArrayList<Body> bodies;
+
     private static int sysID;
     private static Body interloper;
-    private static boolean isInterloper = true;
+    private static boolean interloperIsSelected = true;
+    private static boolean interloperInSimulation= false;
 
     private static FileOperations fileOps;
 
@@ -28,27 +30,32 @@ public class Simulator {        //will not let me set it to static???
         fileOps = fileOperations;
     }
 
-    public static void startUp(int id){
+    public static void startUp(int id, boolean withInterloper){
         sysID = id;
         originalBodies = getSystemData();
         bodies = getSystemData();
-        fileOps.openOutputFileHandle(getSystemName());
+        fileOps.openOutputFileHandle(getSystemName()+interloperIsSelected);
+        interloperInSimulation = withInterloper;
     }
 
     public static void setInterloper(Body inte) {
         // this is called by the GUI when an interloper is selected
         interloper = inte;
-        bodies.add(interloper);
         fileOps.writeFirstLine(true, sysID,getSystemName());
+        if(interloperInSimulation){
+            bodies.add(interloper);
+        }
     }
     public static void setRandomInterloper(){
         //when the user asks for no interloper
         interloper = getRandomInterloper(bodies);
-        bodies.add(interloper);
         fileOps.writeFirstLine(true, sysID,getSystemName());
+        if(interloperInSimulation){
+            bodies.add(interloper);
+        }
     }
     public static void noInterloper(){
-        isInterloper = false;
+        interloperIsSelected = false;
         fileOps.writeFirstLine(false, sysID,getSystemName());
     }
 
@@ -71,16 +78,16 @@ public class Simulator {        //will not let me set it to static???
 
         Body earth = new Body(0,9e8,7382000,0,0,0,"body1",6e24,6371000, true);
         Body earth2 = new Body(0,9e8,-6382000,-1000,0,0,"body2",6e24,6371000, true);
-        Body earth3 = new Body(83820000,9e8,0,0,0,0,"body3",6e23,537100, true);
+  //      Body earth3 = new Body(83820000,9e8,0,0,0,0,"body3",6e23,537100, true);
         Body earth4 = new Body(-6e9,9e8,0,1000,0,0,"body4",6e25,63740000, true);
         earth.setSimulationID(0);
         earth2.setSimulationID(1);
-        earth3.setSimulationID(2);
+   //     earth3.setSimulationID(2);
         earth4.setSimulationID(3);
 
         bodies.add(earth);
         bodies.add(earth2);
-        bodies.add(earth3);
+    //    bodies.add(earth3);
         bodies.add(earth4);
 
 
@@ -107,7 +114,26 @@ public class Simulator {        //will not let me set it to static???
     public static void writeSnapshot(double time){
         fileOps.writeSnapshot(time,bodies);
     }
+    private static ArrayList<Body> revertBodiesToOriginal(){
+        ArrayList<Body> newBodies = new ArrayList<>();
+        for(Body body:originalBodies){
+            newBodies.add(body.returnCopy());
+        }
+        return newBodies;
+    }
     public static void endSimulation(){
+        revertBodiesToOriginal();
+        if(interloperIsSelected == false){
+            //then the user has finished altogether and just wants to leave.
+        }
+        else if(interloperInSimulation){
+            //then the user wants an updated critical mass
+
+        }
+        else{
+            //then the user has selected an interloper, and it hasn't been done yet, so we will play the simulation again with the interloper.
+            bodies.add(interloper);
+        }
         fileOps.closeOutputFileHandle();
     }
 

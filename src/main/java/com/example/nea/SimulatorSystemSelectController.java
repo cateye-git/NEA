@@ -41,23 +41,29 @@ public class SimulatorSystemSelectController implements Initializable {
     }
 
     public void onSelectButtonCLicked(ActionEvent event) throws IOException{
-        //not currently linked to that button yet btw!
         if(currentlySelectedItem != -1){
             //so if user has actually selected an item:
             //send System selected to the correct place
 
-            //open interloper select
+            //Make a new instantiation of the fileOperations class for the simulator
             FileOperations fileOps = new FileOperations();
+            //give it to the simulator
             Simulator.setFileOps(fileOps);
-            Simulator.startUp(currentlySelectedItem);
+            //start the simulator with the currently selected system (without an interloper for now).
+            Simulator.startUp(currentlySelectedItem, false);
 
+            //load the menu for selecting interlopers
             root = FXMLLoader.load(getClass().getResource("InterloperTypeSelect.fxml"));
             stage = (Stage)((Node)event.getSource()).getScene().getWindow();
             scene = new Scene(root);
+            //add the CSS stylesheet
             scene.getStylesheets().add(getClass().getResource("/menus.css").toExternalForm());
             stage.setScene(scene);
+            //set our Stage to this new scene
             stage.show();
         }
+        //if the currentlySelectedItem = -1, the default value, then
+        //the user hasn't selected a system so do nothing.
     }
 
     @Override

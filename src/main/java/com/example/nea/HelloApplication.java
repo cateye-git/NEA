@@ -55,8 +55,8 @@ public class HelloApplication extends Application {
     private Stage myStage;
 
     public void stopAll(){
-        //Platform.exit();
-        // do what you have to do
+
+        //close this window for the user
         myStage.close();
     }
     public void getNewFollowPos(int id){
@@ -275,8 +275,7 @@ public class HelloApplication extends Application {
 
   @Override
    public void start(Stage primaryStage) {
-       Stage stage = new Stage();
-        //runThing(stage);
+    //   Stage stage = new Stage();
     }
 
     public static void main(String[] args) {

@@ -90,4 +90,9 @@ public class Body {
         String ref = name+","+position.convertToCSVEntry()+","+velocity.convertToCSVEntry()+","+radius+","+mass;
         return ref;
     }
+
+    public Body returnCopy(){
+        Body returnBody = new Body(position.returnCopy(),velocity.returnCopy(),name,mass, radius, significant);
+        return  returnBody;
+    }
 }

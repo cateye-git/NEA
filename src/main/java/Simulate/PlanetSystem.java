@@ -7,7 +7,7 @@ public class PlanetSystem {
 
     private static Vector3D[] getAccelerationOfTwoBodies(Vector3D b1Pos, Vector3D b2Pos, double b1Mass, double b2Mass){
         double dist = Vector3D.getDistance(b1Pos, b2Pos);
-        // use this to find the magnitude of the force on each body from F = Gm1m2/r^2, which will be the same for both
+        // use this to find the magnitude of the force on each body from F = Gm1m2/r^3, which will be the same for both
         double massProduct = b1Mass * b2Mass;
         double force = (dist/Math.pow(dist, 3)) * massProduct;
         force = force * G;

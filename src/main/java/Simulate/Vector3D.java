@@ -183,4 +183,10 @@ public class Vector3D {
         Vector3D returnVector = Vector3D.add(to,Vector3D.multiply(from,-1));
         return Vector3D.getUnitVector(returnVector);
     }
+
+    public Vector3D returnCopy(){
+        Vector3D copy = new Vector3D(components[0],components[1],components[2]);
+        copy.setName(name);
+        return copy;
+    }
 }
