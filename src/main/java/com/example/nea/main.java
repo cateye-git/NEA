@@ -18,7 +18,7 @@ public class main extends Application {
         scene.getStylesheets().add(getClass().getResource("/menus.css").toExternalForm());
         //repeat for all scenes
 
-        stage.setTitle("Hello!");
+        stage.setTitle("Celestial Body Simulator");
         stage.setScene(scene);
         stage.show();
     }

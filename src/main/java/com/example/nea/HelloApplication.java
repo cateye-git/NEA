@@ -23,9 +23,9 @@ import java.util.ArrayList;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-public class HelloApplication extends Application {
+public class HelloApplication{
 
-    private static final double everythingMultiplier = 1e-5f;
+    private final double everythingMultiplier = 1e-5f;
 
     private final int screenWidth = 1400;        //  setting the width of the window
     private final int screenHeight = 1000;       //  setting the height of the window
@@ -80,7 +80,7 @@ public class HelloApplication extends Application {
         camLocalZpos = -followBody.getRadius()*3*everythingMultiplier;
 
         //set all translations relative to this body
-        translateCam();
+      //  translateCam();
     }
 
     public void runThing(Stage primaryStage) throws IOException{
@@ -273,6 +273,7 @@ public class HelloApplication extends Application {
         primaryStage.show();
     }
 
+    /*
   @Override
    public void start(Stage primaryStage) {
     //   Stage stage = new Stage();
@@ -281,6 +282,8 @@ public class HelloApplication extends Application {
     public static void main(String[] args) {
         launch();
     }
+
+     */
 
     private static void rotateCam(Camera cam, double amount, double x, double y, double z){
         Transform transform = new Rotate(amount,new Point3D(x,y,z));

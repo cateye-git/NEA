@@ -89,6 +89,13 @@ public class Vector3D {
     }// make a new vector which is the sum of two vectors
     //  by making a new vector and then setting each component to be the sum of the corresponding components
     //  from the other function
+
+    public void addVector(Vector3D v1){
+        v1 = nullTo0(v1);// if any Vectors are supplied which are null, change that to an empty new Vector
+        for(int counter = 0;counter <= 2;counter++){ // set each component to be the sum of the relevant components
+            setComponent(counter, v1.getComponent(counter) + getComponent(counter));
+        }
+    }
     public static double getMagnitude(Vector3D vec){
         vec = nullTo0(vec);
         double magnitude = 0;
@@ -98,6 +105,14 @@ public class Vector3D {
         magnitude = Math.sqrt(magnitude);// square root that sum of squares
         return magnitude;
     } // return the magnitude of the vector, calculated as the root of the sum of the squares of the components
+    public double getMagnitude(){
+        double magnitude = 0;
+        for(double component : getAllComponents()){// sum the squares of the components
+            magnitude += component*component;
+        }
+        magnitude = Math.sqrt(magnitude);// square root that sum of squares
+        return magnitude;
+    }
 
     public static Vector3D getUnitVector(Vector3D vec){
         vec = nullTo0(vec);
@@ -116,6 +131,22 @@ public class Vector3D {
         return unitVector;
     } // return a unit vector of the vector given by dividing each component by the magnitude and putting it in a new object
 
+    public Vector3D getUnitVector(){
+        Vector3D unitVector = new Vector3D(0,0,0, "unit "+getName()); // make a new vector
+        double mag = getMagnitude();
+        if(mag == 0){
+            //if this is true, then 0,0,0 has been passed in
+            //so just skip over everything and return 0
+        }else {
+            int counter = 0;
+            for (double component : getAllComponents()) { // loop through each component of the old vector
+                unitVector.setComponent(counter, component / mag); // set that component of the new vector to be the
+                counter++; // old one divided by the magnitude
+            }
+        }
+        return unitVector;
+    }
+
 
     public static Vector3D multiply(Vector3D vec, double multiplier){
         vec = nullTo0(vec);
@@ -127,6 +158,13 @@ public class Vector3D {
             counter++; // old one multiplied by the multoploier
         }
         return returnVector;
+    }
+    public void multiply(double multiplier){
+        int counter = 0;
+        for(double component : getAllComponents()){ // loop through each component of the old vector
+            setComponent(counter,component*multiplier); // set that component of the new vector to be the
+            counter++; // old one multiplied by the multoploier
+        }
     }
 
     public static double getDistance(Vector3D vec1, Vector3D vec2){
@@ -141,6 +179,18 @@ public class Vector3D {
         distance = Math.sqrt(distance);
         return distance;
     }// get the distance between two vectors by finding the magnitude of the position vector between them
+
+    public double getDistance(Vector3D vec1){
+        vec1 = nullTo0(vec1);
+        double distance = 0;
+        int counter = 0;
+        for(double v1Component : vec1.getAllComponents()){// sum the squares of the distance between the components
+            distance += Math.pow(v1Component - getComponent(counter),2);
+            counter++;
+        }
+        distance = Math.sqrt(distance);
+        return distance;
+    }
 
     private static Vector3D nullTo0(Vector3D vectToConvert){
         // to convert a vector from null to a new vector if necessary
@@ -177,11 +227,22 @@ public class Vector3D {
         return ref;
     }
     public static Vector3D getDirection(Vector3D to, Vector3D from){
-        to = nullTo0(from);
+        to = nullTo0(to);
         from = nullTo0(from);
 
         Vector3D returnVector = Vector3D.add(to,Vector3D.multiply(from,-1));
         return Vector3D.getUnitVector(returnVector);
+    }
+
+    public Vector3D getDirection(Vector3D to){
+        to = nullTo0(to);
+
+        Vector3D returnVector = new Vector3D(0,0,0);
+        int counter = 0;
+        for(double component : to.getAllComponents()){
+            returnVector.setComponent(0, (component - getComponent(counter)*-1));
+        }
+        return  returnVector.getUnitVector();
     }
 
     public Vector3D returnCopy(){

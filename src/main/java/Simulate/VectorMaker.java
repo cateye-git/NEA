@@ -40,7 +40,7 @@ public class VectorMaker {
 
 
 
-        Simulator.checkCollisions(3);
+        //Simulator.checkCollisions(3);
         for(Body body : Simulator.getBodies()){
             System.out.println(body);
         }

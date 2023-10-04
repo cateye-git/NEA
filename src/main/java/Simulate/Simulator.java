@@ -343,7 +343,7 @@ public class Simulator {        //will not let me set it to static???
         }
     }
 
-    public static void checkCollisions(double time){                                           //!!! TURN TO PRIVATE
+    private static void checkCollisions(double time){                                           //!!! TURN TO PRIVATE
         // given that we can treat all bodies as spheres, the easiest way to check for any collisions is to look at
         // whether the distance between any two planets is less than the sum of their radii.
         // if so, a collision has occured
