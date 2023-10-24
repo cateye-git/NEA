@@ -77,7 +77,7 @@ public class Simulator {        //will not let me set it to static???
         ArrayList<Body> bodies = new ArrayList<>();
 
         Body earth = new Body(0,9e8,7382000,0,0,0,"body1",6e24,6371000, true);
-        Body earth2 = new Body(0,9e8,-6382000,-1000,0,0,"body2",6e24,6371000, true);
+        Body earth2 = new Body(0,9e8,-6382000,0,0,100000,"body2",6e24,6371000, true);
   //      Body earth3 = new Body(83820000,9e8,0,0,0,0,"body3",6e23,537100, true);
         Body earth4 = new Body(-6e9,9e8,0,1000,0,0,"body4",6e25,63740000, true);
         earth.setSimulationID(0);
@@ -328,22 +328,25 @@ public class Simulator {        //will not let me set it to static???
 
             //get dt/6 * kv1+2kv2+2kv3+kv4
             sumOfVelocityCoefficients[counter]= Vector3D.add(Vector3D.add(Vector3D.add(kv[0][counter], kv[1][counter]),kv[2][counter]),kv[3][counter]);
-            sumOfVelocityCoefficients[counter] = Vector3D.multiply(sumOfVelocityCoefficients[counter], dt/6);
+            //sumOfVelocityCoefficients[counter] = Vector3D.multiply(sumOfVelocityCoefficients[counter], dt/6);
+            sumOfVelocityCoefficients[counter] = sumOfDisplacementCoefficients[counter].multiply(dt/6);
 
             // use these to set the new position and velocity of the bodies with
             // s += dt/6 * (kv1 + 2kv2 + 2kv3 + kv4)
             // v += dt/6 * (ks1 + 2ks2 + 2ks3 + ks4)
 
             //System.out.println(sumOfVelocityCoefficients[0]);
-            body.setVelocity(Vector3D.add(body.getVelocity(),sumOfDisplacementCoefficients[counter]));
-            body.setPosition(Vector3D.add(body.getPosition(),sumOfVelocityCoefficients[counter]));
+            //body.setVelocity(Vector3D.add(body.getVelocity(),sumOfDisplacementCoefficients[counter]));
+            body.setVelocity(body.getVelocity().addVector(sumOfVelocityCoefficients[counter]));
+            //body.setPosition(Vector3D.add(body.getPosition(),sumOfVelocityCoefficients[counter]));
+            body.setPosition(body.getPosition().addVector(sumOfVelocityCoefficients[counter]));
             counter++;
 
             //  System.out.println(body.getPosition());
         }
     }
 
-    private static void checkCollisions(double time){                                           //!!! TURN TO PRIVATE
+    private static void checkCollisions(double time){                                           //!!! TURN TO PRIVATE IF NOT
         // given that we can treat all bodies as spheres, the easiest way to check for any collisions is to look at
         // whether the distance between any two planets is less than the sum of their radii.
         // if so, a collision has occured
@@ -361,7 +364,8 @@ public class Simulator {        //will not let me set it to static???
                 // get sum of radii
                 double sumOfRadii = body.getRadius() + otherBody.getRadius();
                 // get distance between them
-                double dist = Vector3D.getDistance(body.getPosition(), otherBody.getPosition());
+                //double dist = Vector3D.getDistance(body.getPosition(), otherBody.getPosition());
+                double dist = body.getPosition().getDistance(otherBody.getPosition());
 
                 if(dist <= sumOfRadii){
                     //then a collision has occured
@@ -376,13 +380,16 @@ public class Simulator {        //will not let me set it to static???
                  //   System.out.println("m1 = "+body.getMass()+" m2 = "+otherBody.getMass()+" so mNew = "+newMass);
 
                     //get momentum of old bodies
-                    Vector3D momentumCurrent = Vector3D.multiply(body.getVelocity(),body.getMass());
-                    Vector3D momentumOther = Vector3D.multiply(otherBody.getVelocity(),otherBody.getMass());
+                   // Vector3D momentumCurrent = Vector3D.multiply(body.getVelocity(),body.getMass());
+                    Vector3D momentumCurrent = body.getVelocity().multiply(body.getMass());
+                    //Vector3D momentumOther = Vector3D.multiply(otherBody.getVelocity(),otherBody.getMass());
+                    Vector3D momentumOther = otherBody.getVelocity().multiply(otherBody.getMass());
 
                     //use this to find momentum of new body
-                    Vector3D MVnew = Vector3D.add(momentumCurrent,momentumOther);
+                    Vector3D MVnew = momentumCurrent.addVector(momentumOther);
                     //and so velocity vector
-                    Vector3D Vnew = Vector3D.multiply(MVnew, 1/newMass);
+                    //Vector3D Vnew = Vector3D.multiply(MVnew, 1/newMass);
+                    Vector3D Vnew = MVnew.multiply(1/newMass);
 
                     // the new position should be at the centre of mass between the two objects
                     // this is done by doing (Vfrom 1 to another) * (m1/(m1+m2))
@@ -390,7 +397,7 @@ public class Simulator {        //will not let me set it to static???
                 //    System.out.println("pos from1 to other is" + posBtoA);
                     double ratio = body.getMass() / (otherBody.getMass() + body.getMass());
                  //   System.out.println("ratio is "+ratio);
-                    posBtoA = Vector3D.multiply(posBtoA, ratio);// multiply by ratio
+                    posBtoA = posBtoA.multiply(ratio);// multiply by ratio
                     Vector3D newPos = Vector3D.add(otherBody.getPosition(), posBtoA); // adding to position of otherBody to give the centre of mass
                   //  System.out.println("old pos1: "+body.getPosition()+" old pos2: "+otherBody.getPosition()+" new pos: "+newPos);
 

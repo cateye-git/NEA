@@ -71,13 +71,6 @@ public class Vector3D {
         this.name = name;
     } // initialisation of components and name in constructor
 
-    public Vector3D(Vector3D vec){
-        vec = nullTo0(vec);
-        double[] comps = vec.getAllComponents();
-        setAllComponents(comps[0],comps[1],comps[2]);
-        name = vec.getName();;
-    }// pass by value constructor to copy from other vector 3 object
-
     public static Vector3D add(Vector3D v1, Vector3D v2){
         v1 = nullTo0(v1);// if any Vectors are supplied which are null, change that to an
         v2 = nullTo0(v2);// empty new Vector
@@ -90,11 +83,13 @@ public class Vector3D {
     //  by making a new vector and then setting each component to be the sum of the corresponding components
     //  from the other function
 
-    public void addVector(Vector3D v1){
+    public Vector3D addVector(Vector3D v1){
         v1 = nullTo0(v1);// if any Vectors are supplied which are null, change that to an empty new Vector
+        Vector3D returnVector = new Vector3D(0,0,0);
         for(int counter = 0;counter <= 2;counter++){ // set each component to be the sum of the relevant components
-            setComponent(counter, v1.getComponent(counter) + getComponent(counter));
+            returnVector.setComponent(counter, v1.getComponent(counter) + getComponent(counter));
         }
+        return returnVector;
     }
     public static double getMagnitude(Vector3D vec){
         vec = nullTo0(vec);
@@ -117,16 +112,17 @@ public class Vector3D {
     public static Vector3D getUnitVector(Vector3D vec){
         vec = nullTo0(vec);
         Vector3D unitVector = new Vector3D(0,0,0, "unit "+vec.getName()); // make a new vector
-        if(getMagnitude(vec) == 0){
-            //if this is true, then 0,0,0 has been passed in
+
+        if(getMagnitude(vec) != 0){
+            //if this isn't true, then 0,0,0 has been passed in
             //so just skip over everything and return 0
-        }else {
             double mag = getMagnitude(vec); // get the magnitude of the old vector and save it
             int counter = 0;
             for (double component : vec.getAllComponents()) { // loop through each component of the old vector
                 unitVector.setComponent(counter, component / mag); // set that component of the new vector to be the
                 counter++; // old one divided by the magnitude
             }
+
         }
         return unitVector;
     } // return a unit vector of the vector given by dividing each component by the magnitude and putting it in a new object
@@ -134,10 +130,9 @@ public class Vector3D {
     public Vector3D getUnitVector(){
         Vector3D unitVector = new Vector3D(0,0,0, "unit "+getName()); // make a new vector
         double mag = getMagnitude();
-        if(mag == 0){
-            //if this is true, then 0,0,0 has been passed in
+        if(mag != 0){
+            //if this isn't true, then 0,0,0 has been passed in
             //so just skip over everything and return 0
-        }else {
             int counter = 0;
             for (double component : getAllComponents()) { // loop through each component of the old vector
                 unitVector.setComponent(counter, component / mag); // set that component of the new vector to be the
@@ -159,12 +154,14 @@ public class Vector3D {
         }
         return returnVector;
     }
-    public void multiply(double multiplier){
+    public Vector3D multiply(double multiplier){
         int counter = 0;
+        Vector3D returnVector = new Vector3D(0,0,0);
         for(double component : getAllComponents()){ // loop through each component of the old vector
-            setComponent(counter,component*multiplier); // set that component of the new vector to be the
+            returnVector.setComponent(counter,component*multiplier); // set that component of the new vector to be the
             counter++; // old one multiplied by the multoploier
         }
+        return returnVector;
     }
 
     public static double getDistance(Vector3D vec1, Vector3D vec2){
