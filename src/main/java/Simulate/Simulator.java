@@ -17,10 +17,11 @@ public class Simulator {        //will not let me set it to static???
     // take in which system to add
     // store system and interlopers
     private static Stage stage;
+
     private static SimulatorControllerLoad loader;
 
     private static double quittingTime = 0;
-    private static ArrayList<Body> lastPositionNoInterloper = new ArrayList<>();
+    private static ArrayList<Body> lastSnapNoInterloper = new ArrayList<>();
 
     private static String stageOfRunning; //can be: "runningWithInterloper", "runWithoutInterloper", "neverInterloper"
     public static String getStageOfRunning() {
@@ -181,7 +182,7 @@ public class Simulator {        //will not let me set it to static???
             quittingTime = time;
             //make a copy of the last position of all the bodies
             for(Body body : getBodies()){
-                lastPositionNoInterloper.add(body);
+                lastSnapNoInterloper.add(body);
             }
             //now reset the bodies to the original and add the interloper
             bodies = makeNewBodyList();
@@ -347,6 +348,7 @@ public class Simulator {        //will not let me set it to static???
     }
 
     private static void RK4(double dt){
+        setHabitabilities(bodies);
         int numBodies = bodies.size();
 
         // it is calculated as so:
@@ -424,6 +426,53 @@ public class Simulator {        //will not let me set it to static???
 
             //  System.out.println(body.getPosition());
         }
+    }
+
+    private static double COMcoefficient = 1;
+    private static double velCoefficient = 1;
+    private static double collisionCoefficient = 1e5;
+    private static double habitabilityCoefficient = 2;
+    private static double findSignificance(){
+        double significance = 0;
+        //this subroutine is in charge of finding the significance of the interloper. First it needs some values
+        //the first value is some average of how much the planets have moved.
+        //the best way of doing this would be to find the centre of mass of the whole system
+        //this is because the centre of mass will not move at all when bodies combine.
+        Vector3D noInterloperCOM = new Vector3D(0,0,0);
+        Vector3D withInterloperCOM = new Vector3D(0,0,0);
+
+        Vector3D noInterloperSumOfVelocities = new Vector3D(0,0,0);
+        Vector3D withInterloperSumOfVelocities = new Vector3D(0,0,0);
+
+        double noInterloperHabitability = 0;
+        double withInterloperHabitability = 0;
+
+        for(Body body : lastSnapNoInterloper){
+            noInterloperCOM.addVector(body.getPosition().multiply(body.getMass()));
+            noInterloperSumOfVelocities.addVector(body.getVelocity());
+            if(body instanceof Planet){
+                noInterloperHabitability += ((Planet) body).getHabitability();
+            }
+        }
+
+        for(Body body : bodies){
+            withInterloperCOM.addVector(body.getPosition().multiply(body.getMass()));
+            withInterloperSumOfVelocities.addVector(body.getVelocity());
+            if(body instanceof Planet){
+                withInterloperHabitability += ((Planet) body).getHabitability();
+            }
+        }
+        noInterloperSumOfVelocities.multiply(lastSnapNoInterloper.size());
+        withInterloperSumOfVelocities.multiply(bodies.size());
+
+        double COMChange = Vector3D.getDistance(noInterloperCOM, withInterloperCOM);
+        double velChange = Vector3D.getDistance(noInterloperSumOfVelocities,withInterloperSumOfVelocities);
+        double noCollisions = Math.abs(lastSnapNoInterloper.size() - bodies.size()); //this is the no of collisions
+        double habitabilityChange = Math.abs(withInterloperHabitability - noInterloperHabitability);
+
+        significance += COMChange * COMcoefficient + velChange * velCoefficient + noCollisions + noCollisions * collisionCoefficient + habitabilityChange * habitabilityCoefficient;
+
+        return significance;
     }
 
     private static void checkCollisions(double time){                                           //!!! TURN TO PRIVATE IF NOT
