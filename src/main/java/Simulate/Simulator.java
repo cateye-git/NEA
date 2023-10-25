@@ -105,15 +105,17 @@ public class Simulator {        //will not let me set it to static???
 
         Body earth = new Body(0,9e8,7382000,0,0,0,"body1",6e24,6371000, true);
         Body earth2 = new Body(0,9e8,-6382000,0,0,100000,"body2",6e24,6371000, true);
+        Star sun = new Star(0,9.6e8, 9992000, 0,0,0,"sun",1e23, 3000000, false, 1e5);
   //      Body earth3 = new Body(83820000,9e8,0,0,0,0,"body3",6e23,537100, true);
         Body earth4 = new Body(-6e9,9e8,0,1000,0,0,"body4",6e25,63740000, true);
         earth.setSimulationID(0);
         earth2.setSimulationID(1);
-   //     earth3.setSimulationID(2);
+        sun.setSimulationID(2);
         earth4.setSimulationID(3);
 
         bodies.add(earth);
         bodies.add(earth2);
+        bodies.add(sun);
     //    bodies.add(earth3);
         bodies.add(earth4);
 
@@ -325,6 +327,25 @@ public class Simulator {        //will not let me set it to static???
         return accelerations;
     }
 
+    private static void setHabitabilities(ArrayList<Body> bodies){
+
+        //for each planet, look at all the stars and do an I/r^2 calculation to find the habitability
+        //this code is untested as of 25/10/2023
+        for(Body body : bodies){
+            if(body instanceof Planet){
+                double newHabitability = 0;
+                for(Body otherBody : bodies){
+                    if(otherBody instanceof Star){
+                        double distSquared = Math.pow(Vector3D.getDistance(otherBody.getPosition(), body.getPosition()),2);
+                        newHabitability += ((Star) otherBody).getIllumination()/distSquared;
+                    }
+                }
+
+                ((Planet) body).setHabitability(newHabitability);
+            }
+        }
+    }
+
     private static void RK4(double dt){
         int numBodies = bodies.size();
 
@@ -459,9 +480,26 @@ public class Simulator {        //will not let me set it to static???
                     posBtoA = posBtoA.multiply(ratio);// multiply by ratio
                     Vector3D newPos = Vector3D.add(otherBody.getPosition(), posBtoA); // adding to position of otherBody to give the centre of mass
                   //  System.out.println("old pos1: "+body.getPosition()+" old pos2: "+otherBody.getPosition()+" new pos: "+newPos);
+                    Body newBody = null;
+                    if(body instanceof Star || otherBody instanceof Star) {
+                        double newLuminosity = 0;
+                        if (body instanceof Star) {
+                            newLuminosity += ((Star) body).getIllumination();
+                        }
+                        if (otherBody instanceof Star) {
+                            newLuminosity += ((Star) otherBody).getIllumination();
+                        }
+                        newBody = new Star(newPos,Vnew, "collision between "+body.getName()+" and "+otherBody.getName(), newMass, newRadius, true, newLuminosity);
+                    }
+                    //else if because if a planet collides with a star, it will be unlivable
+                    else if(body instanceof Planet || otherBody instanceof Planet){
+                        newBody = new Planet(newPos, Vnew, "collision between "+body.getName()+" and "+otherBody.getName(), newMass, newRadius, true);
+                    }
+                    else{
+                        newBody = new Body(newPos, Vnew, "collision between "+body.getName()+" and "+otherBody.getName(), newMass, newRadius, true);
+                    }
 
 
-                    Body newBody = new Body(newPos, Vnew, "collision between "+body.getName()+" and "+otherBody.getName(), newMass, newRadius, true);
                     newBody.setSimulationID(getNewSimID());
 
                //     System.out.println(newRadius + " " + newBody);
