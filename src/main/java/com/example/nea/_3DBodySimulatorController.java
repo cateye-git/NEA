@@ -3,10 +3,13 @@ package com.example.nea;
 import Simulate.Body;
 import Simulate.Simulator;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Slider;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
@@ -19,10 +22,15 @@ public class _3DBodySimulatorController implements Initializable {
     @FXML
     private ComboBox<Body> selectBody;
 
+    @FXML
+    private Slider dtSlider;
+    @FXML
+    private Slider camSpeedSlider;
+
     HelloApplication hi;
 
     public void closeSim(ActionEvent event) throws Exception {
-        Simulator.endSimulation();
+        //Simulator.endSimulation();
         hi.stopAll();
     }
 
@@ -42,6 +50,22 @@ public class _3DBodySimulatorController implements Initializable {
         selectBody.setOnAction(this::selectBodyToFollow);
         selectBody.setOnMousePressed(this::updateBodies);
         selectBody.setValue(Simulator.getBodies().get(0));
+
+        dtSlider.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                double dtValue = dtSlider.getValue();
+                hi.changedtValue(dtValue);
+            }
+        });
+
+        camSpeedSlider.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                double camSpeedValue = camSpeedSlider.getValue();
+                hi.changeCamSpeedValue(camSpeedValue);
+            }
+        });
     }
 
     private void updateBodies(MouseEvent mouseEvent) {

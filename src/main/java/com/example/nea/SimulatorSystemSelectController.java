@@ -50,7 +50,7 @@ public class SimulatorSystemSelectController implements Initializable {
             //give it to the simulator
             Simulator.setFileOps(fileOps);
             //start the simulator with the currently selected system (without an interloper for now).
-            Simulator.startUp(currentlySelectedItem, false);
+
 
             //load the menu for selecting interlopers
             root = FXMLLoader.load(getClass().getResource("InterloperTypeSelect.fxml"));
@@ -59,6 +59,7 @@ public class SimulatorSystemSelectController implements Initializable {
             //add the CSS stylesheet
             scene.getStylesheets().add(getClass().getResource("/menus.css").toExternalForm());
             stage.setScene(scene);
+            Simulator.startUp(currentlySelectedItem, false, stage);
             //set our Stage to this new scene
             stage.show();
         }

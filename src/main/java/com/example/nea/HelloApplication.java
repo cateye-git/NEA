@@ -25,12 +25,13 @@ import java.time.LocalDateTime;
 
 public class HelloApplication{
 
+    private AnimationTimer timer;
     private final double everythingMultiplier = 1e-5f;
 
     private final int screenWidth = 1400;        //  setting the width of the window
     private final int screenHeight = 1000;       //  setting the height of the window
 
-    private final double fileWriteInterval = 60;
+    private final double fileWriteInterval = 3600;
     private double timeElapsed = 0;
     private double timeElapsedSinceLastFileWrite = 0;
 
@@ -57,7 +58,10 @@ public class HelloApplication{
     public void stopAll(){
 
         //close this window for the user
+        //stop application from still running
+        timer.stop();
         myStage.close();
+        Simulator.endSimulation(timeElapsed);
     }
     public void getNewFollowPos(int id){
 
@@ -174,7 +178,7 @@ public class HelloApplication{
         } );
 
 
-        AnimationTimer timer = new AnimationTimer() {
+        timer = new AnimationTimer() {
             @Override
             public void handle(long timeStamp) {
 
@@ -298,5 +302,12 @@ public class HelloApplication{
         cam.setTranslateX(followPos.getComponent(0) + camLocalXpos);
         cam.setTranslateY(-followPos.getComponent(1) + camLocalYpos);
         cam.setTranslateZ(followPos.getComponent(2) + camLocalZpos);
+    }
+
+    public void changedtValue(double val){
+        dtMultiplier = val;
+    }
+    public void changeCamSpeedValue(double val){
+        camSpeed = val;
     }
 }

@@ -1,5 +1,13 @@
 package Simulate;
 
+import com.example.nea.SimulatorControllerLoad;
+import com.example.nea.main;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -8,6 +16,16 @@ public class Simulator {        //will not let me set it to static???
 
     // take in which system to add
     // store system and interlopers
+    private static Stage stage;
+    private static SimulatorControllerLoad loader;
+
+    private static double quittingTime = 0;
+    private static ArrayList<Body> lastPositionNoInterloper = new ArrayList<>();
+
+    private static String stageOfRunning; //can be: "runningWithInterloper", "runWithoutInterloper", "neverInterloper"
+    public static String getStageOfRunning() {
+        return stageOfRunning;
+    }
 
     private static ArrayList<Body> originalBodies; //this is to be set when the system is selected and at no other times.
 
@@ -30,17 +48,25 @@ public class Simulator {        //will not let me set it to static???
         fileOps = fileOperations;
     }
 
-    public static void startUp(int id, boolean withInterloper){
+    public static void startUp(int id, boolean withInterloper, Stage prevStage){
+        stage = prevStage;
         sysID = id;
         originalBodies = getSystemData();
         bodies = getSystemData();
-        fileOps.openOutputFileHandle(getSystemName()+interloperIsSelected);
         interloperInSimulation = withInterloper;
+        fileOps.openOutputFileHandle(getSystemName()+interloperInSimulation);
     }
 
-    public static void setInterloper(Body inte) {
+    public static void restart(){
+        fileOps = new FileOperations();
+        fileOps.openOutputFileHandle(getSystemName()+interloperInSimulation);
+        fileOps.writeFirstLine(interloperInSimulation, sysID,getSystemName());
+    }
+
+    public static void setInterloper(Body inter) {
+        stageOfRunning = "runWithoutInterloper";
         // this is called by the GUI when an interloper is selected
-        interloper = inte;
+        interloper = inter;
         fileOps.writeFirstLine(true, sysID,getSystemName());
         if(interloperInSimulation){
             bodies.add(interloper);
@@ -57,6 +83,7 @@ public class Simulator {        //will not let me set it to static???
     public static void noInterloper(){
         interloperIsSelected = false;
         fileOps.writeFirstLine(false, sysID,getSystemName());
+        stageOfRunning = "neverInterloper";
     }
 
     public static ArrayList<Body> getBodies(){
@@ -114,27 +141,59 @@ public class Simulator {        //will not let me set it to static???
     public static void writeSnapshot(double time){
         fileOps.writeSnapshot(time,bodies);
     }
-    private static ArrayList<Body> revertBodiesToOriginal(){
+    private static ArrayList<Body> makeNewBodyList(){
         ArrayList<Body> newBodies = new ArrayList<>();
         for(Body body:originalBodies){
             newBodies.add(body.returnCopy());
         }
         return newBodies;
     }
-    public static void endSimulation(){
-        revertBodiesToOriginal();
+    public static void endSimulation(double time){
+        fileOps.closeOutputFileHandle();
+
+        //there are 3 possibilities in this scenario:
+        // 1: the user just wants to leave
+        // 2: the user has run without the interloper and now wants to run with it
+        // 3: the user has run with the interloper and now wants a critical mass
+
+        //in 2 and 3, we need to store data about the system that has just been run.
+
+        //revertBodiesToOriginal();
         if(interloperIsSelected == false){
             //then the user has finished altogether and just wants to leave.
+            //so just boot up the main menu
+            System.out.println("finished");
         }
         else if(interloperInSimulation){
+            System.out.println("giving crit mass");
             //then the user wants an updated critical mass
+
+            //first we need to calculate the significance
+
 
         }
         else{
+            System.out.println("running again w interloper");
             //then the user has selected an interloper, and it hasn't been done yet, so we will play the simulation again with the interloper.
+            //first we need the quitting time so that we know when to quit next time
+            quittingTime = time;
+            //make a copy of the last position of all the bodies
+            for(Body body : getBodies()){
+                lastPositionNoInterloper.add(body);
+            }
+            //now reset the bodies to the original and add the interloper
+            bodies = makeNewBodyList();
             bodies.add(interloper);
+
+            loader = new SimulatorControllerLoad(stage);
+            loader.load("3DBodySimulator.fxml", "test");
+
+            interloperInSimulation = true;
+            stageOfRunning = "runningWithInterloper";
+            restart();
+
         }
-        fileOps.closeOutputFileHandle();
+
     }
 
 
@@ -426,4 +485,5 @@ public class Simulator {        //will not let me set it to static???
 
 
     }
+
 }

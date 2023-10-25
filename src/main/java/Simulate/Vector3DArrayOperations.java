@@ -17,7 +17,7 @@ public class Vector3DArrayOperations {
     public static Vector3D[] multiplyVectors(Vector3D[] array, double mult){
         Vector3D[] out = new Vector3D[array.length];
         for(int index = 0;index<array.length;index++){
-            out[index] = array[index].multiply(mult);
+            out[index] = Vector3D.multiply(array[index],mult);
         }
         return out;
     }

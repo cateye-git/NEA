@@ -128,6 +128,7 @@ public class Vector3D {
     } // return a unit vector of the vector given by dividing each component by the magnitude and putting it in a new object
 
     public Vector3D getUnitVector(){
+        nullTo0(this);
         Vector3D unitVector = new Vector3D(0,0,0, "unit "+getName()); // make a new vector
         double mag = getMagnitude();
         if(mag != 0){
@@ -155,12 +156,20 @@ public class Vector3D {
         return returnVector;
     }
     public Vector3D multiply(double multiplier){
-        int counter = 0;
         Vector3D returnVector = new Vector3D(0,0,0);
-        for(double component : getAllComponents()){ // loop through each component of the old vector
-            returnVector.setComponent(counter,component*multiplier); // set that component of the new vector to be the
-            counter++; // old one multiplied by the multoploier
+        try{
+            nullTo0(this);
+            int counter = 0;
+            for(double component : getAllComponents()){ // loop through each component of the old vector
+                returnVector.setComponent(counter,component*multiplier); // set that component of the new vector to be the
+                counter++; // old one multiplied by the multoploier
+            }
         }
+        catch (Exception e){
+            System.out.println(e);
+
+        }
+
         return returnVector;
     }
 

@@ -32,7 +32,7 @@ public class VectorMaker {
       //  bodies.add(moon);
      //   bodies.add(otherBody);
 
-        Simulator.startUp(3, true);
+        Simulator.startUp(3, true, null);
         for(Body body : Simulator.getBodies()){
             System.out.println(body);
         }
