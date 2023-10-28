@@ -35,6 +35,8 @@ public class HelloApplication{
     private double timeElapsed = 0;
     private double timeElapsedSinceLastFileWrite = 0;
 
+
+
     private final double mouseSens = 0.1f;
     private double camSpeed = 1e6*everythingMultiplier;
     private double dtMultiplier = 1;
@@ -51,9 +53,14 @@ public class HelloApplication{
     private double mouseX;
     private double mouseY;
 
+    public double getTimeElapsed(){
+        return  timeElapsed;
+    }
+
 
     private ArrayList<Body> bodies;
     private Stage myStage;
+
 
     public void stopAll(){
 
@@ -197,9 +204,12 @@ public class HelloApplication{
                 lastTime = LocalDateTime.now();
                 nanoTime *= dtMultiplier / 1e9;
                 timeElapsed += nanoTime;
+                if(timeElapsed >= Simulator.getQuitTime() && Simulator.getStageOfRunning() == "runningWithInterloper"){
+                    stopAll();
+                }
                 timeElapsedSinceLastFileWrite += nanoTime;
                 if(timeElapsedSinceLastFileWrite >= fileWriteInterval){
-                    System.out.println("printing to file now!");
+                    //System.out.println("printing to file now!");
                     while(timeElapsedSinceLastFileWrite >= fileWriteInterval) {
                         timeElapsedSinceLastFileWrite -= fileWriteInterval;
                     }

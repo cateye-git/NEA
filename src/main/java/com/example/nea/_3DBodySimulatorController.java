@@ -2,6 +2,7 @@ package com.example.nea;
 
 import Simulate.Body;
 import Simulate.Simulator;
+import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -9,6 +10,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
@@ -26,17 +28,21 @@ public class _3DBodySimulatorController implements Initializable {
     private Slider dtSlider;
     @FXML
     private Slider camSpeedSlider;
+    @FXML
+    private ProgressBar percentage;
+    private AnimationTimer timer;
 
     HelloApplication hi;
 
     public void closeSim(ActionEvent event) throws Exception {
         //Simulator.endSimulation();
         hi.stopAll();
+        timer.stop();
     }
 
 
     @Override
-    public void initialize(URL url, ResourceBundle resourceBundle){ //called when the scene is initialised
+    public void initialize(URL url, ResourceBundle resourceBundle) { //called when the scene is initialised
         Stage stage = new Stage();
         hi = new HelloApplication();
         try {
@@ -44,7 +50,7 @@ public class _3DBodySimulatorController implements Initializable {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        for(Body body : Simulator.getBodies()){
+        for (Body body : Simulator.getBodies()) {
             selectBody.getItems().add(body);
         }
         selectBody.setOnAction(this::selectBodyToFollow);
@@ -66,6 +72,20 @@ public class _3DBodySimulatorController implements Initializable {
                 hi.changeCamSpeedValue(camSpeedValue);
             }
         });
+
+        timer = new AnimationTimer() {
+            @Override
+            public void handle(long timeStamp) {
+                if(Simulator.getQuitTime() == 0){
+                    percentage.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
+                }
+                else{
+                    percentage.setProgress(hi.getTimeElapsed() / Simulator.getQuitTime());
+                }
+            };
+        };
+        timer.start();
+
     }
 
     private void updateBodies(MouseEvent mouseEvent) {

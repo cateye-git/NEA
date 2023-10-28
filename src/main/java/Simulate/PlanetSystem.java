@@ -2,6 +2,8 @@ package Simulate;
 
 import java.util.ArrayList;
 
+
+//      this is legacy and is not used any more
 public class PlanetSystem {
     private static double G = 6.674e-11;// gravitational constant needed to calculate accurate positions
 

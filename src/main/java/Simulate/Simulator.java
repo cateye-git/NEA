@@ -19,8 +19,13 @@ public class Simulator {        //will not let me set it to static???
     private static Stage stage;
 
     private static SimulatorControllerLoad loader;
+    private static double interloperSignificance = 0;
 
     private static double quittingTime = 0;
+
+    public static double getQuitTime(){
+        return quittingTime;
+    }
     private static ArrayList<Body> lastSnapNoInterloper = new ArrayList<>();
 
     private static String stageOfRunning; //can be: "runningWithInterloper", "runWithoutInterloper", "neverInterloper"
@@ -35,11 +40,30 @@ public class Simulator {        //will not let me set it to static???
     private static ArrayList<Body> bodies;
 
     private static int sysID;
+
+    public static double getInterloperSignificance() {
+        return interloperSignificance;
+    }
+
+    public static Body getInterloper() {
+        return interloper;
+    }
+
+    public static double getProposedNewMass() {
+        return proposedNewMass;
+    }
+
+    public static void updateInterloperMass(){
+        interloper.setMass(proposedNewMass);
+    }
+
     private static Body interloper;
     private static boolean interloperIsSelected = true;
     private static boolean interloperInSimulation= false;
 
     private static FileOperations fileOps;
+
+    static double proposedNewMass = 0;
 
     private static int getNewSimID(){
         simulationID++;
@@ -94,6 +118,7 @@ public class Simulator {        //will not let me set it to static???
     public static void updateBodies(double dt, double time){
         RK4(dt);
         checkCollisions(time);
+        setHabitabilities(bodies);
     }
 
 
@@ -106,7 +131,7 @@ public class Simulator {        //will not let me set it to static???
 
         Body earth = new Body(0,9e8,7382000,0,0,0,"body1",6e24,6371000, true);
         Body earth2 = new Body(0,9e8,-6382000,0,0,100000,"body2",6e24,6371000, true);
-        Star sun = new Star(0,9.6e8, 9992000, 0,0,0,"sun",1e23, 3000000, false, 1e5);
+        Star sun = new Star(0,9.6e8, 9992000, 0,0,0,"sun",1e23, 3000000, true, 1e5);
   //      Body earth3 = new Body(83820000,9e8,0,0,0,0,"body3",6e23,537100, true);
         Body earth4 = new Body(-6e9,9e8,0,1000,0,0,"body4",6e25,63740000, true);
         earth.setSimulationID(0);
@@ -151,7 +176,11 @@ public class Simulator {        //will not let me set it to static???
         }
         return newBodies;
     }
+
+    static private double significanceCuttoff = 1e5;
+    static private double significanceMultiplier = 1e-5;
     public static void endSimulation(double time){
+        loader = new SimulatorControllerLoad(stage);
         fileOps.closeOutputFileHandle();
 
         //there are 3 possibilities in this scenario:
@@ -166,13 +195,19 @@ public class Simulator {        //will not let me set it to static???
             //then the user has finished altogether and just wants to leave.
             //so just boot up the main menu
             System.out.println("finished");
+            loader.load("MainMenuView","Main Menu");
         }
         else if(interloperInSimulation){
             System.out.println("giving crit mass");
             //then the user wants an updated critical mass
-
             //first we need to calculate the significance
+            interloperSignificance = findSignificance(); //this returns a number which corresponds to the significance;
+            System.out.println(interloperSignificance);
+            //now we need to find a new mass of the interloper based on this significance
+            proposedNewMass = interloper.getMass() / ((interloperSignificance/significanceCuttoff)*significanceMultiplier);
+            //then we show it to the user:
 
+            loader.load("SignificanceValue.fxml", "Controls");
 
         }
         else{
@@ -182,13 +217,14 @@ public class Simulator {        //will not let me set it to static???
             quittingTime = time;
             //make a copy of the last position of all the bodies
             for(Body body : getBodies()){
-                lastSnapNoInterloper.add(body);
+                lastSnapNoInterloper.add(body.returnCopy());
             }
+            System.out.println("size of last snap is: "+lastSnapNoInterloper.size());
             //now reset the bodies to the original and add the interloper
             bodies = makeNewBodyList();
             bodies.add(interloper);
 
-            loader = new SimulatorControllerLoad(stage);
+            //loader = new SimulatorControllerLoad(stage);
             loader.load("3DBodySimulator.fxml", "test");
 
             interloperInSimulation = true;
@@ -201,6 +237,7 @@ public class Simulator {        //will not let me set it to static???
 
 
     private static Body getRandomInterloper(ArrayList<Body> bodies){
+        System.out.println("making a random interloper from bodies of length "+bodies.size());
         //to be called when the user asks for a random interloper
         // position will be a random one between the furthest body and double that distance
         // mass will be, at first, the same as the averages of the bodies
@@ -233,9 +270,10 @@ public class Simulator {        //will not let me set it to static???
         }
         double interloperMass = sumOfMass / noBodies;// mass = average = (sum of masses)/(no bodies)
 
-        //the position = the unit vector * (1 + a random no from 0 to 1)
-        Vector3D interloperPosition = Vector3D.multiply(unitRandom, 1 + random.nextFloat());
-        Vector3D interloperVelocity = new Vector3D(0,0,0);
+        //the position = the unit vector * (random between furthest out and double that)
+        double distAway = largestPos * (1 + random.nextFloat());
+        Vector3D interloperPosition = Vector3D.multiply(unitRandom, distAway);
+        Vector3D interloperVelocity = interloperPosition.multiply(-0.01f);
 
         //to get the correct radius, we will need the density and the mass of the interloper
         //this will allow us to find the volume, which we can use to find the radius
@@ -249,6 +287,7 @@ public class Simulator {        //will not let me set it to static???
 
 
         Body interloper = new Body(interloperPosition,interloperVelocity, "Interloper",interloperMass, interloperRadius, false);
+        System.out.println("interloper made is "+interloper);
         return interloper;
     }
 
@@ -348,7 +387,6 @@ public class Simulator {        //will not let me set it to static???
     }
 
     private static void RK4(double dt){
-        setHabitabilities(bodies);
         int numBodies = bodies.size();
 
         // it is calculated as so:
@@ -433,6 +471,11 @@ public class Simulator {        //will not let me set it to static???
     private static double collisionCoefficient = 1e5;
     private static double habitabilityCoefficient = 2;
     private static double findSignificance(){
+
+        System.out.println("");
+        System.out.println("finding significance between lists:");
+        //System.out.println("first list length "+lastSnapNoInterloper.size());
+        //System.out.println("and second list length "+bodies.size());
         double significance = 0;
         //this subroutine is in charge of finding the significance of the interloper. First it needs some values
         //the first value is some average of how much the planets have moved.
@@ -447,28 +490,55 @@ public class Simulator {        //will not let me set it to static???
         double noInterloperHabitability = 0;
         double withInterloperHabitability = 0;
 
+        double origSize = 0;
+        double newSize = 0;
+
+        double sumOfOldMass = 0;
+        double sumOfNewMass = 0;
+
         for(Body body : lastSnapNoInterloper){
-            noInterloperCOM.addVector(body.getPosition().multiply(body.getMass()));
-            noInterloperSumOfVelocities.addVector(body.getVelocity());
-            if(body instanceof Planet){
-                noInterloperHabitability += ((Planet) body).getHabitability();
+            if(body.isSignificant()) {
+                //System.out.println("looking at "+body);
+                origSize++;
+                noInterloperCOM = noInterloperCOM.addVector(body.getPosition().multiply(body.getMass()));
+                noInterloperSumOfVelocities = noInterloperSumOfVelocities.addVector(body.getVelocity());
+                sumOfOldMass += body.getMass();
+                if (body instanceof Planet) {
+                    noInterloperHabitability += ((Planet) body).getHabitability();
+                }
             }
         }
 
         for(Body body : bodies){
-            withInterloperCOM.addVector(body.getPosition().multiply(body.getMass()));
-            withInterloperSumOfVelocities.addVector(body.getVelocity());
-            if(body instanceof Planet){
-                withInterloperHabitability += ((Planet) body).getHabitability();
+            if(body.isSignificant()) {
+                //System.out.println("looking at "+body);
+                newSize++;
+                withInterloperCOM = withInterloperCOM.addVector(body.getPosition().multiply(body.getMass()));
+                withInterloperSumOfVelocities = withInterloperSumOfVelocities.addVector(body.getVelocity());
+                if (body instanceof Planet) {
+                    withInterloperHabitability += ((Planet) body).getHabitability();
+                }
+                sumOfNewMass += body.getMass();
             }
         }
-        noInterloperSumOfVelocities.multiply(lastSnapNoInterloper.size());
-        withInterloperSumOfVelocities.multiply(bodies.size());
+        noInterloperSumOfVelocities.multiply(1/origSize);
+        withInterloperSumOfVelocities.multiply(1/newSize);
+
+        noInterloperCOM = noInterloperCOM.multiply(1/sumOfOldMass);
+        withInterloperCOM = withInterloperCOM.multiply(1/sumOfNewMass);
+        //we do the same thing to the velocity to make it a bit more 'normalised':
+        noInterloperSumOfVelocities = noInterloperSumOfVelocities.multiply(1/sumOfOldMass);
+        withInterloperSumOfVelocities = withInterloperSumOfVelocities.multiply(1/sumOfNewMass);
 
         double COMChange = Vector3D.getDistance(noInterloperCOM, withInterloperCOM);
         double velChange = Vector3D.getDistance(noInterloperSumOfVelocities,withInterloperSumOfVelocities);
-        double noCollisions = Math.abs(lastSnapNoInterloper.size() - bodies.size()); //this is the no of collisions
+        double noCollisions = Math.abs(origSize - newSize); //this is the no of collisions
         double habitabilityChange = Math.abs(withInterloperHabitability - noInterloperHabitability);
+
+        System.out.println("centre of mass has changed by: " +COMChange);
+        System.out.println("av velocity had changed by: " +velChange);
+        System.out.println("no collisions: "+noCollisions);
+        System.out.println("habitability change: "+habitabilityChange);
 
         significance += COMChange * COMcoefficient + velChange * velCoefficient + noCollisions + noCollisions * collisionCoefficient + habitabilityChange * habitabilityCoefficient;
 

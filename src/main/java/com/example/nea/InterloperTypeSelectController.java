@@ -48,7 +48,7 @@ public class InterloperTypeSelectController {
     public void onNoInterloperCLick(ActionEvent event) throws IOException {
         Simulator.noInterloper();
 
-        root = FXMLLoader.load(getClass().getResource("3DSimulator.fxml"));
+        root = FXMLLoader.load(getClass().getResource("3DBodySimulator.fxml"));
         stage = (Stage)((Node)event.getSource()).getScene().getWindow();
         scene = new Scene(root);
         scene.getStylesheets().add(getClass().getResource("/menus.css").toExternalForm());

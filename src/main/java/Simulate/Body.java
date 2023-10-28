@@ -60,6 +60,15 @@ public class Body {
     }
 
     private double radius;
+
+    public boolean isSignificant() {
+        return significant;
+    }
+
+    public void setSignificant(boolean significant) {
+        this.significant = significant;
+    }
+
     private boolean significant; // whether body should be outputted in CSV file
 
     // initialising
@@ -82,7 +91,7 @@ public class Body {
 
     @Override
     public String toString(){
-        String ref = "celestial body with mass "+mass+", name "+name+" and "+position+" and "+ velocity;
+        String ref = "body "+name+", mass "+mass+" and "+position+" and "+ velocity;
         return ref;
     }   //  return the name, mass and vectors when the item is printed
 

@@ -1,5 +1,6 @@
 package com.example.nea;
 
+import Database.MariaDBConnector;
 import Simulate.FileOperations;
 import Simulate.Simulator;
 import javafx.beans.value.ChangeListener;
@@ -14,8 +15,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 
+
+
 import java.io.IOException;
 import java.net.URL;
+
 import java.util.ResourceBundle;
 
 public class SimulatorSystemSelectController implements Initializable {
@@ -73,8 +77,9 @@ public class SimulatorSystemSelectController implements Initializable {
 
         //this would fetch all the Systems and then format them as so:
         //ID    name
+        //ResultSet results = MariaDBConnector.makeQuery("select * from system");
+        //result is in form: systemID(int) name(String)
 
-        SelectSystemForSim.getItems().add("1\tmarsMoons");
         SelectSystemForSim.getItems().add("2\tmercuryMoons");
         SelectSystemForSim.getItems().add("3\tearthMoonOrbit");
 

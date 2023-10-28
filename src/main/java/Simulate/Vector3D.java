@@ -53,7 +53,7 @@ public class Vector3D {
 
     @Override
     public String toString(){
-        String ref = "3D Vector named "+ name+ " with components ("+getComponent(0)+", "
+        String ref = "vector "+ name+ " ("+getComponent(0)+", "
                 +getComponent(1)+ ", "+ getComponent(2)+")";
         return ref;
     }   //  return the name and all the components when the item is printed

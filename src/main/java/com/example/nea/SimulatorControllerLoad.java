@@ -17,17 +17,17 @@ public class SimulatorControllerLoad {
 
     public void load(String name, String title)
     {
-        System.out.println("1");
+        //System.out.println("1");
         FXMLLoader fxmlLoader = new FXMLLoader(main.class.getResource(name));
         Scene scene = null;
-        System.out.println("2");
+        //System.out.println("2");
         try {
             scene = new Scene(fxmlLoader.load());
         } catch (Exception e) {
             System.out.println("something went wrong in SimulatorControllerLoad: "+e);
         }
 
-        System.out.println("3");
+        //System.out.println("3");
         //String css = getClass().getResource("menus.css").toExternalForm();
         //scene.getStylesheets().add(css);
         scene.getStylesheets().add(getClass().getResource("/menus.css").toExternalForm());
