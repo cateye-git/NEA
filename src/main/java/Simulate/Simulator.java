@@ -420,6 +420,7 @@ public class Simulator {        //will not let me set it to static???
         kv[3] = Vector3DArrayOperations.addVectors(kv[0],Vector3DArrayOperations.multiplyVectors(ks[2],dt)); // velocity + ks2 * dt
 
 
+        /*
         //temp
         System.out.println("RK4 steps: ");
         System.out.println("");
@@ -442,6 +443,8 @@ public class Simulator {        //will not let me set it to static???
                 System.out.println(k2);
             }
         }
+
+         */
         // use kv and ks to predict new position and velocity
 
         int counter = 0;
@@ -457,21 +460,21 @@ public class Simulator {        //will not let me set it to static???
         for(Body body : bodies){
             //get dt/6 * ks1+2ks2+2ks3+ks4
             sumOfDisplacementCoefficients[counter]= Vector3D.add(Vector3D.add(Vector3D.add(ks[0][counter], ks[1][counter]),ks[2][counter]),ks[3][counter]);
-            System.out.println("showing sumOfDisplacementCoefficient:");
-            System.out.println(counter + " " + sumOfDisplacementCoefficients[counter]);
+            //System.out.println("showing sumOfDisplacementCoefficient:");
+            //System.out.println(counter + " " + sumOfDisplacementCoefficients[counter]);
 
             sumOfDisplacementCoefficients[counter] = Vector3D.multiply(sumOfDisplacementCoefficients[counter], dt/6);
-            System.out.println("Now multiplied by dt/6: ");
-            System.out.println(counter + " " + sumOfDisplacementCoefficients[counter]);
+            //System.out.println("Now multiplied by dt/6: ");
+            //System.out.println(counter + " " + sumOfDisplacementCoefficients[counter]);
 
             //get dt/6 * kv1+2kv2+2kv3+kv4
             sumOfVelocityCoefficients[counter]= Vector3D.add(Vector3D.add(Vector3D.add(kv[0][counter], kv[1][counter]),kv[2][counter]),kv[3][counter]);
-            System.out.println("showing sumOfVelocityCoefficient:");
-            System.out.println(counter + " " + sumOfVelocityCoefficients[counter]);
+            //System.out.println("showing sumOfVelocityCoefficient:");
+            //System.out.println(counter + " " + sumOfVelocityCoefficients[counter]);
             //sumOfVelocityCoefficients[counter] = Vector3D.multiply(sumOfVelocityCoefficients[counter], dt/6);
             sumOfVelocityCoefficients[counter] = sumOfVelocityCoefficients[counter].multiply(dt/6);
-            System.out.println("Now multiplied by dt/6: ");
-            System.out.println(counter + " " + sumOfVelocityCoefficients[counter]);
+            //System.out.println("Now multiplied by dt/6: ");
+            //System.out.println(counter + " " + sumOfVelocityCoefficients[counter]);
 
 
             // use these to set the new position and velocity of the bodies with
