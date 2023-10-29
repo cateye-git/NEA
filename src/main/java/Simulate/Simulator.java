@@ -1,5 +1,6 @@
 package Simulate;
 
+import Database.MariaDBConnector;
 import com.example.nea.SimulatorControllerLoad;
 import com.example.nea.main;
 import javafx.fxml.FXMLLoader;
@@ -35,7 +36,7 @@ public class Simulator {        //will not let me set it to static???
 
     private static ArrayList<Body> originalBodies; //this is to be set when the system is selected and at no other times.
 
-    private static int simulationID = 0;
+    //private static int simulationID = 0;
 
     private static ArrayList<Body> bodies;
 
@@ -65,10 +66,6 @@ public class Simulator {        //will not let me set it to static???
 
     static double proposedNewMass = 0;
 
-    private static int getNewSimID(){
-        simulationID++;
-        return simulationID;
-    }
     public static void setFileOps(FileOperations fileOperations){
         fileOps = fileOperations;
     }
@@ -123,47 +120,32 @@ public class Simulator {        //will not let me set it to static???
 
 
     public static ArrayList<Body> getSystemData(){
+        System.out.println("getting system data");
 
         //select all bodies from the required system, name is done in separate subroutine
 
         //test data
         ArrayList<Body> bodies = new ArrayList<>();
 
-        Body earth = new Body(0,9e8,7382000,0,0,0,"body1",6e24,6371000, true);
-        Body earth2 = new Body(0,9e8,-6382000,0,0,100000,"body2",6e24,6371000, true);
-        Star sun = new Star(0,9.6e8, 9992000, 0,0,0,"sun",1e23, 3000000, true, 1e5);
-  //      Body earth3 = new Body(83820000,9e8,0,0,0,0,"body3",6e23,537100, true);
-        Body earth4 = new Body(-6e9,9e8,0,1000,0,0,"body4",6e25,63740000, true);
-        earth.setSimulationID(0);
-        earth2.setSimulationID(1);
-        sun.setSimulationID(2);
-        earth4.setSimulationID(3);
-
-        bodies.add(earth);
-        bodies.add(earth2);
-        bodies.add(sun);
-    //    bodies.add(earth3);
-        bodies.add(earth4);
-
-
         /*
-        Body earth = new Body(0,0,100,1e3,0,0,"earth",20,200, true);
-        Body earth2 = new Body(0,0,-100,1e3,0,0,"eart2h",20,200, true);
-        earth.setSimulationID(getNewSimID());
-        earth2.setSimulationID(getNewSimID());
-
+        Body earth = new Body(0,9e8,7382000,0,0,0,"body1",6e24,6371000, true);
+        earth.setSimulationID(0);
         bodies.add(earth);
-        bodies.add(earth2);
 
          */
 
+        try{
+            bodies = MariaDBConnector.getBodiesOfSystem(sysID);
+        }
+        catch (Exception e){
+            System.out.println("problem with fetching bodies at simulator level: "+e);
+        }
         return bodies;
     }
     public static String getSystemName(){
 
         //get the name of the system with this ID from the database for storing to the CSV file
-
-        return "testSystem";
+        return MariaDBConnector.getSystemName(sysID);
     }
 
     public static void writeSnapshot(double time){
@@ -619,7 +601,7 @@ public class Simulator {        //will not let me set it to static???
                     }
 
 
-                    newBody.setSimulationID(getNewSimID());
+                   // newBody.setSimulationID(getNewSimID());
 
                //     System.out.println(newRadius + " " + newBody);
                     bodies.remove(iterator);

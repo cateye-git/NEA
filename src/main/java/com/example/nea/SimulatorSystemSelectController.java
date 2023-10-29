@@ -79,29 +79,18 @@ public class SimulatorSystemSelectController implements Initializable {
         //ID    name
         //ResultSet results = MariaDBConnector.makeQuery("select * from system");
         //result is in form: systemID(int) name(String)
+        String[] systems = MariaDBConnector.getSystems();
+        for(String system : systems){
+            SelectSystemForSim.getItems().add(system);
+        }
 
-        SelectSystemForSim.getItems().add("2\tmercuryMoons");
-        SelectSystemForSim.getItems().add("3\tearthMoonOrbit");
-
-        SelectSystemForSim.getItems().add("4\tmarsMoons");
-        SelectSystemForSim.getItems().add("5\tmercuryMoons");
-        SelectSystemForSim.getItems().add("6\tearthMoonOrbit");
-        SelectSystemForSim.getItems().add("7\tmarsMoons");
-        SelectSystemForSim.getItems().add("8\tmercuryMoons");
-        SelectSystemForSim.getItems().add("9\tearthMoonOrbit");
-        SelectSystemForSim.getItems().add("10\tmarsMoons");
-        SelectSystemForSim.getItems().add("11\tmercuryMoons");
-        SelectSystemForSim.getItems().add("12\tearthMoonOrbit");
-        SelectSystemForSim.getItems().add("13\tmarsMoons");
-        SelectSystemForSim.getItems().add("14\tmercuryMoons");
-        SelectSystemForSim.getItems().add("15\tearthMoonOrbit");
 
         SelectSystemForSim.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
                 //this means that whenever an item is selected it gets the index of that item in the list
                 //which just happens to be the SystemID. How convenient!
-                currentlySelectedItem = SelectSystemForSim.getSelectionModel().getSelectedIndex();
+                currentlySelectedItem = SelectSystemForSim.getSelectionModel().getSelectedIndex() + 1;
             }
         });
     }

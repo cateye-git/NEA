@@ -1,5 +1,6 @@
 package com.example.nea;
 
+import Database.MariaDBConnector;
 import Simulate.Simulator;
 import Simulate.Vector3D;
 import javafx.beans.value.ChangeListener;
@@ -65,6 +66,7 @@ public class SignificanceValueController implements Initializable {
 
     public void exitPressed(){
         //close application
+        MariaDBConnector.closeConnection();
         javafx.application.Platform.exit();
     }
 
