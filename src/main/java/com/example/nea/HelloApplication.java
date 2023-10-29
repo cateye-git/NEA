@@ -31,7 +31,7 @@ public class HelloApplication{
     private final int screenWidth = 1400;        //  setting the width of the window
     private final int screenHeight = 1000;       //  setting the height of the window
 
-    private final double fileWriteInterval = 3600;
+    private final double fileWriteInterval = 60;
     private double timeElapsed = 0;
     private double timeElapsedSinceLastFileWrite = 0;
 
@@ -202,12 +202,20 @@ public class HelloApplication{
                  */
 
                 lastTime = LocalDateTime.now();
-                nanoTime *= dtMultiplier / 1e9;
-                timeElapsed += nanoTime;
+                //nanoTime *= dtMultiplier / 1e9;
+                //nanoTime *= dtMultiplier;
+                //timeElapsed += nanoTime;
+
+                timeElapsed += 60; //TEMP
                 if(timeElapsed >= Simulator.getQuitTime() && Simulator.getStageOfRunning() == "runningWithInterloper"){
                     stopAll();
                 }
-                timeElapsedSinceLastFileWrite += nanoTime;
+                //timeElapsedSinceLastFileWrite += nanoTime;
+                timeElapsedSinceLastFileWrite += 60; //temp
+
+                Simulator.updateBodies(60,timeElapsed);
+                //Simulator.updateBodies(nanoTime, timeElapsed);
+                //TEMP!!!
                 if(timeElapsedSinceLastFileWrite >= fileWriteInterval){
                     //System.out.println("printing to file now!");
                     while(timeElapsedSinceLastFileWrite >= fileWriteInterval) {
@@ -219,7 +227,8 @@ public class HelloApplication{
 
                // System.out.println(deltaTime);
 
-                Simulator.updateBodies(nanoTime, timeElapsed);
+
+
                 // now we need to update the spheres
 
                 //in case any bodies have been removed (collisions):

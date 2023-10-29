@@ -2,11 +2,6 @@ package Simulate;
 
 import Database.MariaDBConnector;
 import com.example.nea.SimulatorControllerLoad;
-import com.example.nea.main;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -279,8 +274,9 @@ public class Simulator {        //will not let me set it to static???
         double dist = Vector3D.getDistance(b1Pos, b2Pos);
         // use this to find the magnitude of the force on each body from F = Gm1m2/r^2, which will be the same for both
         double massProduct = b1Mass * b2Mass;
-        double force = (dist/Math.pow(dist, 3)) * massProduct;
+        double force = Math.pow(dist, -2) * massProduct;
         force = force * G;
+        // correct force is being generated
 
         // we then need to find the position vector between body A and body B
         double[] body1PosArray = b1Pos.getAllComponents();
@@ -298,6 +294,8 @@ public class Simulator {        //will not let me set it to static???
         //  System.out.println("a1 = "+acceleration1 + " a2 = "+acceleration2);
 
         Vector3D[] accs = {acceleration1, acceleration2};
+        //System.out.println(accs[0] + " " + accs[1]);
+        //accelerations are working correctly for 2 bodies
         return accs;
     }// gets the acceleration on two bodies based on their position and masses
 
@@ -346,6 +344,12 @@ public class Simulator {        //will not let me set it to static???
             accelerations[0] = new Vector3D(0,0,0);
         }
 
+        /*
+        for(Vector3D acc : accelerations){
+            System.out.println(acc);
+        }
+        accelerations are working correctly for bodies
+         */
         return accelerations;
     }
 
@@ -397,6 +401,7 @@ public class Simulator {        //will not let me set it to static???
         // get positions and masses
         Vector3D[] positions = new Vector3D[numBodies];
         Double[] masses = new Double[numBodies];
+        //calculting kv[0]
         for(int counter = 0; counter < numBodies;counter++){
             Body currentBody = bodies.get(counter);
             positions[counter] = currentBody.getPosition();// record relevant position and mass
@@ -405,12 +410,38 @@ public class Simulator {        //will not let me set it to static???
         }
         ks[0] = getAllAccelerations(positions,masses); // pass those positions and masses to calc acceleration
 
+        ks[1] = getAllAccelerations(Vector3DArrayOperations.addVectors(positions, Vector3DArrayOperations.multiplyVectors(kv[0],dt/2)),masses);
+        kv[1] = Vector3DArrayOperations.addVectors(kv[0],Vector3DArrayOperations.multiplyVectors(ks[0],dt/2));
+
         ks[2] = getAllAccelerations(Vector3DArrayOperations.addVectors(positions,Vector3DArrayOperations.multiplyVectors(kv[1],dt/2)),masses); // acc of(position + kv1 * dt/2)
         kv[2] = Vector3DArrayOperations.addVectors(kv[0],Vector3DArrayOperations.multiplyVectors(ks[1],dt/2)); // velocity + ks1 * dt/2
 
         ks[3] = getAllAccelerations(Vector3DArrayOperations.addVectors(positions,Vector3DArrayOperations.multiplyVectors(kv[2],dt)),masses); // acc of(position + kv2 * dt)
         kv[3] = Vector3DArrayOperations.addVectors(kv[0],Vector3DArrayOperations.multiplyVectors(ks[2],dt)); // velocity + ks2 * dt
 
+
+        //temp
+        System.out.println("RK4 steps: ");
+        System.out.println("");
+        System.out.println("ks:");
+        int test = 0;
+        for (Vector3D[] k: ks) {
+            System.out.println("ks "+test);
+            test++;
+            for(Vector3D k2 : k) {
+                System.out.println(k2);
+            }
+        }
+        System.out.println("");
+        System.out.println("kv:");
+        test = 0;
+        for (Vector3D[] k: kv ) {
+            System.out.println("kv "+test);
+            test++;
+            for(Vector3D k2 : k) {
+                System.out.println(k2);
+            }
+        }
         // use kv and ks to predict new position and velocity
 
         int counter = 0;
@@ -426,12 +457,22 @@ public class Simulator {        //will not let me set it to static???
         for(Body body : bodies){
             //get dt/6 * ks1+2ks2+2ks3+ks4
             sumOfDisplacementCoefficients[counter]= Vector3D.add(Vector3D.add(Vector3D.add(ks[0][counter], ks[1][counter]),ks[2][counter]),ks[3][counter]);
+            System.out.println("showing sumOfDisplacementCoefficient:");
+            System.out.println(counter + " " + sumOfDisplacementCoefficients[counter]);
+
             sumOfDisplacementCoefficients[counter] = Vector3D.multiply(sumOfDisplacementCoefficients[counter], dt/6);
+            System.out.println("Now multiplied by dt/6: ");
+            System.out.println(counter + " " + sumOfDisplacementCoefficients[counter]);
 
             //get dt/6 * kv1+2kv2+2kv3+kv4
             sumOfVelocityCoefficients[counter]= Vector3D.add(Vector3D.add(Vector3D.add(kv[0][counter], kv[1][counter]),kv[2][counter]),kv[3][counter]);
+            System.out.println("showing sumOfVelocityCoefficient:");
+            System.out.println(counter + " " + sumOfVelocityCoefficients[counter]);
             //sumOfVelocityCoefficients[counter] = Vector3D.multiply(sumOfVelocityCoefficients[counter], dt/6);
-            sumOfVelocityCoefficients[counter] = sumOfDisplacementCoefficients[counter].multiply(dt/6);
+            sumOfVelocityCoefficients[counter] = sumOfVelocityCoefficients[counter].multiply(dt/6);
+            System.out.println("Now multiplied by dt/6: ");
+            System.out.println(counter + " " + sumOfVelocityCoefficients[counter]);
+
 
             // use these to set the new position and velocity of the bodies with
             // s += dt/6 * (kv1 + 2kv2 + 2kv3 + kv4)
@@ -439,7 +480,7 @@ public class Simulator {        //will not let me set it to static???
 
             //System.out.println(sumOfVelocityCoefficients[0]);
             //body.setVelocity(Vector3D.add(body.getVelocity(),sumOfDisplacementCoefficients[counter]));
-            body.setVelocity(body.getVelocity().addVector(sumOfVelocityCoefficients[counter]));
+            body.setVelocity(body.getVelocity().addVector(sumOfDisplacementCoefficients[counter]));
             //body.setPosition(Vector3D.add(body.getPosition(),sumOfVelocityCoefficients[counter]));
             body.setPosition(body.getPosition().addVector(sumOfVelocityCoefficients[counter]));
             counter++;
