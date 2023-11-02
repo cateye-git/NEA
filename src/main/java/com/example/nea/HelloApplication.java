@@ -204,7 +204,7 @@ public class HelloApplication{
                 lastTime = LocalDateTime.now();
                 nanoTime *= dtMultiplier / 1e9;
                 //nanoTime *= dtMultiplier;
-                //timeElapsed += nanoTime;
+                timeElapsed += nanoTime;
 
                 //timeElapsed += 60; //TEMP
                 if(timeElapsed >= Simulator.getQuitTime() && Simulator.getStageOfRunning() == "runningWithInterloper"){
