@@ -33,8 +33,6 @@ public class InterloperTypeSelectController {
         scene.getStylesheets().add(getClass().getResource("/menus.css").toExternalForm());
         stage.setScene(scene);
         stage.show();
-        //send the fact that there is a random interloper to PLACE NEEDED
-     //   Simulator.setRandomInterloper();
     }
     public void onSpecifiedInterloperCLick(ActionEvent event) throws IOException {
 

@@ -18,6 +18,8 @@ public class MainMenuController {
 
 
     public void onSimulatorButtonClick(ActionEvent event) throws IOException {
+        com.example.nea.FXMLLoader.changeInExistingWindow(event,"SimulatorSystemSelect.fxml");
+        /*
         System.out.println("sim click");
         root = FXMLLoader.load(getClass().getResource("SimulatorSystemSelect.fxml"));
         stage = (Stage)((Node)event.getSource()).getScene().getWindow();
@@ -25,6 +27,8 @@ public class MainMenuController {
         scene.getStylesheets().add(getClass().getResource("/menus.css").toExternalForm());
         stage.setScene(scene);
         stage.show();
+
+         */
     }
     public void onEditorButtonClick(ActionEvent event) throws IOException {
         System.out.println("editor click");

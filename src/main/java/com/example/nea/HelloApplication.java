@@ -297,18 +297,6 @@ public class HelloApplication{
         primaryStage.show();
     }
 
-    /*
-  @Override
-   public void start(Stage primaryStage) {
-    //   Stage stage = new Stage();
-    }
-
-    public static void main(String[] args) {
-        launch();
-    }
-
-     */
-
     private static void rotateCam(Camera cam, double amount, double x, double y, double z){
         Transform transform = new Rotate(amount,new Point3D(x,y,z));
         cam.getTransforms().add(transform);
