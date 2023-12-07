@@ -31,6 +31,8 @@ public class MainMenuController {
          */
     }
     public void onEditorButtonClick(ActionEvent event) throws IOException {
+        com.example.nea.FXMLLoader.changeInExistingWindow(event,"CreatorSystemSelect.fxml");
+        /*
         System.out.println("editor click");
         root = FXMLLoader.load(getClass().getResource("CreatorSystemSelect.fxml"));
         stage = (Stage)((Node)event.getSource()).getScene().getWindow();
@@ -38,5 +40,7 @@ public class MainMenuController {
         scene.getStylesheets().add(getClass().getResource("/menus.css").toExternalForm());
         stage.setScene(scene);
         stage.show();
+
+         */
     }
 }

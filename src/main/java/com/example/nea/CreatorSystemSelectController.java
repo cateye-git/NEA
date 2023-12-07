@@ -1,5 +1,6 @@
 package com.example.nea;
 
+import Database.MariaDBConnector;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -31,12 +32,16 @@ public class CreatorSystemSelectController implements Initializable {
 
     public void onMainMenuClick(ActionEvent event) throws IOException {
         //return to the main menu
+        com.example.nea.FXMLLoader.changeInExistingWindow(event,"mainMenuView.fxml");
+        /*
         Parent root = FXMLLoader.load(getClass().getResource("mainMenuView.fxml"));
         stage = (Stage)((Node)event.getSource()).getScene().getWindow();
         scene = new Scene(root);
         scene.getStylesheets().add(getClass().getResource("/menus.css").toExternalForm());
         stage.setScene(scene);
         stage.show();
+
+         */
     }
 
     public void addNew(ActionEvent event){
@@ -58,7 +63,10 @@ public class CreatorSystemSelectController implements Initializable {
             errorLabel.setText("please select a system");
         }
         else{
+            System.out.println("copying id "+currentlySelectedItem);
             //copy the selected system and all associated bodies in the database
+            MariaDBConnector.copySystem(currentlySelectedItem);
+            updateView();
         }
 
     }
@@ -69,6 +77,7 @@ public class CreatorSystemSelectController implements Initializable {
         }
         else{
             //delete the selected system and all associated bodies in the database
+            MariaDBConnector.deleteSystem(currentlySelectedItem);
         }
     }
 
@@ -78,31 +87,34 @@ public class CreatorSystemSelectController implements Initializable {
 
         //this would fetch all the Systems and then format them as so:
         //ID    name
+//         exactly the same as in SimulatorSystemSelectController.
+        /*
+        String[] systems = MariaDBConnector.getSystems();
+        //result is in form: systemID(int) name(String)
+        for(String system : systems){
+            SelectSystemForSim.getItems().add(system);
+        }
+         */
 
-        SelectSystemForSim.getItems().add("1\tmarsMoons");
-        SelectSystemForSim.getItems().add("2\tmercuryMoons");
-        SelectSystemForSim.getItems().add("3\tearthMoonOrbit");
-
-        SelectSystemForSim.getItems().add("4\tmarsMoons");
-        SelectSystemForSim.getItems().add("5\tmercuryMoons");
-        SelectSystemForSim.getItems().add("6\tearthMoonOrbit");
-        SelectSystemForSim.getItems().add("7\tmarsMoons");
-        SelectSystemForSim.getItems().add("8\tmercuryMoons");
-        SelectSystemForSim.getItems().add("9\tearthMoonOrbit");
-        SelectSystemForSim.getItems().add("10\tmarsMoons");
-        SelectSystemForSim.getItems().add("11\tmercuryMoons");
-        SelectSystemForSim.getItems().add("12\tearthMoonOrbit");
-        SelectSystemForSim.getItems().add("13\tmarsMoons");
-        SelectSystemForSim.getItems().add("14\tmercuryMoons");
-        SelectSystemForSim.getItems().add("15\tearthMoonOrbit");
+        updateView();
 
         SelectSystemForSim.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
                 //this means that whenever an item is selected it gets the index of that item in the list
-                //which just happens to be the SystemID. How convenient!
-                System.out.println(SelectSystemForSim.getSelectionModel().getSelectedIndex());
+                //which just happens to be the SystemID - 1. How convenient!
+                currentlySelectedItem = SelectSystemForSim.getSelectionModel().getSelectedIndex()+1;
             }
         });
+    }
+
+    private void updateView(){
+
+        String[] systems = MariaDBConnector.getSystems();
+        for(String system : systems){
+            System.out.println("line 114 CreatorSelectSystem: " +system);
+            SelectSystemForSim.getItems().add(system);
+        }
+        SelectSystemForSim.getItems().removeAll();
     }
 }

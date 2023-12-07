@@ -75,11 +75,10 @@ public class SimulatorSystemSelectController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
 
-        //this would fetch all the Systems and then format them as so:
-        //ID    name
-        //ResultSet results = MariaDBConnector.makeQuery("select * from system");
-        //result is in form: systemID(int) name(String)
+        //this fetches all the Systems and formats them
+
         String[] systems = MariaDBConnector.getSystems();
+        //result is in form: systemID(int) name(String)
         for(String system : systems){
             SelectSystemForSim.getItems().add(system);
         }

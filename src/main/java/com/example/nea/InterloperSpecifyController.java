@@ -49,12 +49,16 @@ public class InterloperSpecifyController{
 
         Simulator.setInterloper(body);
 
+        com.example.nea.FXMLLoader.changeInExistingWindow(event,"3DBodySimulator.fxml");
+        /*
         root = FXMLLoader.load(getClass().getResource("3DBodySimulator.fxml"));
         stage = (Stage)((Node)event.getSource()).getScene().getWindow();
         scene = new Scene(root);
         scene.getStylesheets().add(getClass().getResource("/menus.css").toExternalForm());
         stage.setScene(scene);
         stage.show();
+
+         */
 
         //send info to set interloper as body made
 

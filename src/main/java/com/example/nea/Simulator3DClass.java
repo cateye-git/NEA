@@ -4,8 +4,6 @@ import Simulate.Body;
 import Simulate.Simulator;
 import Simulate.Vector3D;
 import javafx.animation.AnimationTimer;
-import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.geometry.Point3D;
 import javafx.scene.Camera;
 import javafx.scene.Group;
@@ -23,7 +21,7 @@ import java.util.ArrayList;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-public class HelloApplication{
+public class Simulator3DClass {
 
     private AnimationTimer timer;
     private final double everythingMultiplier = 1e-5f;
@@ -94,23 +92,21 @@ public class HelloApplication{
       //  translateCam();
     }
 
-    public void runThing(Stage primaryStage) throws IOException{
+    public void main3D(Stage primaryStage) throws IOException{
         myStage = primaryStage;
 
         bodies = Simulator.getBodies();
         Group group = new Group();
 
-        //impors spheres as bodies
+        //import spheres as bodies
         ArrayList<Sphere> spheres = new ArrayList<>();
         for(Body body : bodies){
             Sphere sphere = new Sphere(0);
             sphere.setRadius(body.getRadius()*everythingMultiplier);
-         //   sphere.translateXProperty().set(screenWidth/2);             //  moving the sphere to the centre of the screen
-         //   sphere.translateYProperty().set(screenHeight/2);
             sphere.translateXProperty().set(body.getPosition().getComponent(0)*everythingMultiplier);
             sphere.translateYProperty().set(body.getPosition().getComponent(1)*everythingMultiplier*-1);
             sphere.translateZProperty().set(body.getPosition().getComponent(2)*everythingMultiplier);
-            System.out.println("added sphere at "+body.getPosition().getComponent(0)+ " " + body.getPosition().getComponent(1)*-1 + " "+ body.getPosition().getComponent(2));
+            //System.out.println("added sphere at "+body.getPosition().getComponent(0)+ " " + body.getPosition().getComponent(1)*-1 + " "+ body.getPosition().getComponent(2));
             group.getChildren().add(sphere);
 
             spheres.add(sphere);
@@ -245,8 +241,9 @@ public class HelloApplication{
 
 
                  */
-                //if there's a discrepancy, remove em all and add some new!
-
+                //if there's a discrepancy, remove all and then add new
+                //this is inefficient but because of the way I have set it up, it is very hard to effectively
+                //find the correct Sphere to remove
                 if(bodies.size() != spheres.size()){
                     while(spheres.size() > 0){
                         group.getChildren().remove(spheres.get((0)));
@@ -278,7 +275,7 @@ public class HelloApplication{
                 //    System.out.println(" ");
             }catch (Exception e){
                     System.out.println(bodies.size() + " " + spheres.size());
-                    throw new RuntimeException(e);
+                    throw new RuntimeException("dicrepency when configuring spheres: " + e);
                 }
 
                 translateCam();

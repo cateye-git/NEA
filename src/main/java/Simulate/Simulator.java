@@ -172,7 +172,7 @@ public class Simulator {        //will not let me set it to static???
             //then the user has finished altogether and just wants to leave.
             //so just boot up the main menu
             System.out.println("finished");
-            loader.load("MainMenuView","Main Menu");
+            loader.load("MainMenuView.fxml","Main Menu");
         }
         else if(interloperInSimulation){
             System.out.println("giving crit mass");

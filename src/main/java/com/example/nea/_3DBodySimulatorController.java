@@ -3,7 +3,6 @@ package com.example.nea;
 import Simulate.Body;
 import Simulate.Simulator;
 import javafx.animation.AnimationTimer;
-import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -32,11 +31,12 @@ public class _3DBodySimulatorController implements Initializable {
     private ProgressBar percentage;
     private AnimationTimer timer;
 
-    HelloApplication hi;
+    Simulator3DClass Simulation;
+
 
     public void closeSim(ActionEvent event) throws Exception {
         //Simulator.endSimulation();
-        hi.stopAll();
+        Simulation.stopAll();
         timer.stop();
     }
 
@@ -44,9 +44,9 @@ public class _3DBodySimulatorController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) { //called when the scene is initialised
         Stage stage = new Stage();
-        hi = new HelloApplication();
+        Simulation = new Simulator3DClass();
         try {
-            hi.runThing(stage);
+            Simulation.main3D(stage);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -61,7 +61,7 @@ public class _3DBodySimulatorController implements Initializable {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 double dtValue = dtSlider.getValue();
-                hi.changedtValue(dtValue);
+                Simulation.changedtValue(dtValue);
             }
         });
 
@@ -69,7 +69,7 @@ public class _3DBodySimulatorController implements Initializable {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 double camSpeedValue = camSpeedSlider.getValue();
-                hi.changeCamSpeedValue(camSpeedValue);
+                Simulation.changeCamSpeedValue(camSpeedValue);
             }
         });
 
@@ -80,7 +80,7 @@ public class _3DBodySimulatorController implements Initializable {
                     percentage.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
                 }
                 else{
-                    percentage.setProgress(hi.getTimeElapsed() / Simulator.getQuitTime());
+                    percentage.setProgress(Simulation.getTimeElapsed() / Simulator.getQuitTime());
                 }
             };
         };
@@ -106,6 +106,6 @@ public class _3DBodySimulatorController implements Initializable {
             //so get the first body.
         }
         //Simulator.getBodies().indexOf(body);
-        hi.getNewFollowPos(id);
+        Simulation.getNewFollowPos(id);
     }
 }

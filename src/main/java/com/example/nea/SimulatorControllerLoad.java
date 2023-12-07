@@ -6,6 +6,8 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+
+
 public class SimulatorControllerLoad {
 
     private Stage stage;
