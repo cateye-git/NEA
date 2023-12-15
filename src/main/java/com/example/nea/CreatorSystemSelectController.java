@@ -43,13 +43,12 @@ public class CreatorSystemSelectController implements Initializable {
         //send to editor with that ID
 
         try {
-            Object classObject = loader.changeInExistingWindowReturnController(event, editorName);
+            //com.example.nea.FXMLLoader.changeInExistingWindow(event,"CreatorEditor.fxml");
+            Object classObject = loader.changeInExistingWindowReturnController(event, "CreatorEditor.fxml");
 
-            //System.out.println(classObject.getClass().getName());
-            MainMenuController controller = (MainMenuController) classObject.getClass().cast(classObject);
-            controller.onExitButtonClick(event);
-
-            //return loader.getController();
+            System.out.println(classObject.getClass().getName());
+            CreatorEditorController controller = (CreatorEditorController) classObject.getClass().cast(classObject);
+            controller.gettingSystem(id);
         } catch (IOException e) {
             throw new RuntimeException("there was a problem with loading that: "+e);
         }
@@ -108,8 +107,11 @@ public class CreatorSystemSelectController implements Initializable {
                 //the text is in the form "ID name" so I need to split by spaces and grab
                 //all of the stuff which is before the first space
                 //then convert it to an integer.
-
-                String selectedItemString = SelectSystemForSim.getSelectionModel().getSelectedItem();
+                String selectedItemString = "-1 failure";
+                try{
+                 selectedItemString = SelectSystemForSim.getSelectionModel().getSelectedItem();}
+                catch (Exception e){
+                }
                 String[] stringParts = selectedItemString.split(" ", 2);
                 int idOfSelected = Integer.valueOf(stringParts[0]);
                 currentlySelectedItem = idOfSelected;

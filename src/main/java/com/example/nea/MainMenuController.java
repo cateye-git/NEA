@@ -33,6 +33,7 @@ public class MainMenuController {
     }
     public void onEditorButtonClick(ActionEvent event) throws IOException {
         com.example.nea.FXMLLoader.changeInExistingWindow(event,"CreatorSystemSelect.fxml");
+
         /*
         System.out.println("editor click");
         root = FXMLLoader.load(getClass().getResource("CreatorSystemSelect.fxml"));
