@@ -13,6 +13,10 @@
         <font>
             <Font size="24.0" />
         </font></Button>
+    <Button layoutX="14.0" layoutY="340.0" onAction="#onExitButtonClick" prefHeight="90" prefWidth="350.0" text="Exit" textFill="WHITE" textOverrun="WORD_ELLIPSIS">
+        <font>
+            <Font size="24.0" />
+        </font></Button>
     <Label layoutX="274.0" layoutY="26.0" prefHeight="70.0" prefWidth="452.0" text="Celestial Body Simulate">
         <font>
             <Font size="40.0" />

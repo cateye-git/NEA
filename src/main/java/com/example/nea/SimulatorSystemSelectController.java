@@ -57,6 +57,8 @@ public class SimulatorSystemSelectController implements Initializable {
 
 
             //load the menu for selecting interlopers
+            com.example.nea.FXMLLoader.changeInExistingWindow(event, "InterloperTypeSelect.fxml");
+            /*
             root = FXMLLoader.load(getClass().getResource("InterloperTypeSelect.fxml"));
             stage = (Stage)((Node)event.getSource()).getScene().getWindow();
             scene = new Scene(root);
@@ -66,6 +68,8 @@ public class SimulatorSystemSelectController implements Initializable {
             Simulator.startUp(currentlySelectedItem, false, stage);
             //set our Stage to this new scene
             stage.show();
+
+             */
         }
         //if the currentlySelectedItem = -1, the default value, then
         //the user hasn't selected a system so do nothing.
@@ -89,7 +93,13 @@ public class SimulatorSystemSelectController implements Initializable {
             public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
                 //this means that whenever an item is selected it gets the index of that item in the list
                 //which just happens to be the SystemID. How convenient!
-                currentlySelectedItem = SelectSystemForSim.getSelectionModel().getSelectedIndex() + 1;
+                //currentlySelectedItem = SelectSystemForSim.getSelectionModel().getSelectedIndex() + 1;
+
+                //get the ID from the string of the selection
+                String selectedItemString = SelectSystemForSim.getSelectionModel().getSelectedItem();
+                String[] stringParts = selectedItemString.split(" ", 2);
+                int idOfSelected = Integer.valueOf(stringParts[0]);
+                currentlySelectedItem = idOfSelected;
             }
         });
     }

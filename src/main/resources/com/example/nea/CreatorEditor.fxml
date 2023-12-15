@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="650.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.nea.CreatorEditorController">
+    <ListView fx:id="SelectBody" fixedCellSize="50.0" layoutX="372.0" layoutY="26.0" prefHeight="613.0" prefWidth="617.0" />
+    <Button layoutX="14.0" layoutY="350.0" mnemonicParsing="false" onAction="#deleteSelected" prefHeight="90.0" prefWidth="350.0" text="Delete" />
+    <Button layoutX="14.0" layoutY="450.0" mnemonicParsing="false" onAction="#copySelected" prefHeight="90.0" prefWidth="350.0" text="Copy" />
+    <Button layoutX="14.0" layoutY="550.0" mnemonicParsing="false" onAction="#onMainMenuClick" prefHeight="90.0" prefWidth="350.0" text="Main menu" />
+    <Label fx:id="errorLabel" layoutX="26.0" layoutY="17.0" prefHeight="19.0" prefWidth="350.0" text="System Editor" />
+
+</AnchorPane>

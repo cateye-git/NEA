@@ -5,7 +5,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -23,9 +22,12 @@ public class CreatorSystemSelectController implements Initializable {
     @FXML
     private ListView<String> SelectSystemForSim;
 
+    private final String editorName = "CreatorEditor.fxml";
+
     private Stage stage;
     private Scene scene;
     private Parent root;
+    private final FXMLLoader loader = new FXMLLoader();
     @FXML
     private Label errorLabel;
     private int currentlySelectedItem = -1;
@@ -33,20 +35,27 @@ public class CreatorSystemSelectController implements Initializable {
     public void onMainMenuClick(ActionEvent event) throws IOException {
         //return to the main menu
         com.example.nea.FXMLLoader.changeInExistingWindow(event,"mainMenuView.fxml");
-        /*
-        Parent root = FXMLLoader.load(getClass().getResource("mainMenuView.fxml"));
-        stage = (Stage)((Node)event.getSource()).getScene().getWindow();
-        scene = new Scene(root);
-        scene.getStylesheets().add(getClass().getResource("/menus.css").toExternalForm());
-        stage.setScene(scene);
-        stage.show();
-
-         */
     }
 
     public void addNew(ActionEvent event){
-        //send to the editor with an ID of -1 meaning a new system
+        //make a new system with name "unnamed", and send to the editor with that system
+        int id = MariaDBConnector.addNewSystem();
+        //send to editor with that ID
+
+        try {
+            Object classObject = loader.changeInExistingWindowReturnController(event, editorName);
+
+            //System.out.println(classObject.getClass().getName());
+            MainMenuController controller = (MainMenuController) classObject.getClass().cast(classObject);
+            controller.onExitButtonClick(event);
+
+            //return loader.getController();
+        } catch (IOException e) {
+            throw new RuntimeException("there was a problem with loading that: "+e);
+        }
+
     }
+
     public void editSelected(ActionEvent event) throws IOException{
         if(currentlySelectedItem == -1){
             //user has not yet selected a system
@@ -88,33 +97,33 @@ public class CreatorSystemSelectController implements Initializable {
         //this would fetch all the Systems and then format them as so:
         //ID    name
 //         exactly the same as in SimulatorSystemSelectController.
-        /*
-        String[] systems = MariaDBConnector.getSystems();
-        //result is in form: systemID(int) name(String)
-        for(String system : systems){
-            SelectSystemForSim.getItems().add(system);
-        }
-         */
-
         updateView();
-
         SelectSystemForSim.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
-                //this means that whenever an item is selected it gets the index of that item in the list
-                //which just happens to be the SystemID - 1. How convenient!
-                currentlySelectedItem = SelectSystemForSim.getSelectionModel().getSelectedIndex()+1;
+                //this is run whenever the user selects a different system.
+
+                //so now I need to change the currently selected system to that which has been selected,
+                //so I need the selected system ID
+                //the text is in the form "ID name" so I need to split by spaces and grab
+                //all of the stuff which is before the first space
+                //then convert it to an integer.
+
+                String selectedItemString = SelectSystemForSim.getSelectionModel().getSelectedItem();
+                String[] stringParts = selectedItemString.split(" ", 2);
+                int idOfSelected = Integer.valueOf(stringParts[0]);
+                currentlySelectedItem = idOfSelected;
             }
         });
     }
 
     private void updateView(){
-
+        SelectSystemForSim.getSelectionModel().clearSelection();
+        SelectSystemForSim.getItems().clear();
         String[] systems = MariaDBConnector.getSystems();
         for(String system : systems){
             System.out.println("line 114 CreatorSelectSystem: " +system);
             SelectSystemForSim.getItems().add(system);
         }
-        SelectSystemForSim.getItems().removeAll();
     }
 }

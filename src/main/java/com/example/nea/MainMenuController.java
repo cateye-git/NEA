@@ -1,5 +1,6 @@
 package com.example.nea;
 
+import Database.MariaDBConnector;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -42,5 +43,10 @@ public class MainMenuController {
         stage.show();
 
          */
+    }
+
+    public void onExitButtonClick(ActionEvent event) throws  IOException{
+        MariaDBConnector.closeConnection();
+        javafx.application.Platform.exit();
     }
 }

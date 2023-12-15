@@ -32,9 +32,6 @@ public class MariaDBConnector {
         catch (Exception e){
             System.out.printf("error creating mariaDB connection: " + e);
         }
-
-
-        makeQuery("insert into position (posX, posY, posZ) values (0,0,0);");
     }
 
     private static ResultSet makeQuery(String query){
@@ -134,8 +131,10 @@ public class MariaDBConnector {
                 systemName = systemDetails.getString(2);
             }
             if(noOfResults > 1){
-                throw  new RuntimeException("more than 1 system with ID "+id);
+                throw new RuntimeException("more than 1 system with ID "+id); //this shouldn't be the case because the
+                //                                                              database will error if it happens
             }
+
             //  now I know what the system name is that I need, so let's make a new system:
             makeQuery("insert into system (name) values (\""+systemName+"\");");
 
@@ -148,7 +147,7 @@ public class MariaDBConnector {
                     ", posZ, velX, velY, velZ from linker, position, velocity where position.posID = linker.posID and" +
                     " velocity.velID = linker.velID and linker.systemID = "+id+";");
 
-            int greatestID = getHighestID("system", "systemID");
+            int greatestSysID = getHighestID("system", "systemID"); // so this should get the ID that we just made
             //System.out.println("the highest systemID is "+greatestID);
 
             while(linkingDetails.next()){
@@ -157,31 +156,28 @@ public class MariaDBConnector {
                         linkingDetails.getInt(5),linkingDetails.getInt(6)};//pos x y z
                 int[] velEntity = {linkingDetails.getInt(7),
                         linkingDetails.getInt(8),linkingDetails.getInt(9)};//vel x y z
-
                 //and we make the linker later
 
-                System.out.println("the positions to insert are:");
-                for (int a : posEntity){
-                    System.out.println(a);
-                }
 
-                System.out.println("putting the new position in");
-                makeQuery("insert into position (posX, posY, posZ) values ("+posEntity[0]+","+posEntity[1]+","
-                                                +posEntity[2]+");");
-                System.out.println("putting the new velocity in");
                 makeQuery("insert into velocity (velX, velY, velZ) values ("+velEntity[0]+","+velEntity[1]+","
                         +velEntity[2]+");");
+                //unfortunately, for the position, I've managed to name the table as some function or keyword so if my
+                //query contains 'position' and then a bracket, it will throw an error
+                //this means that I need to put in the ID unfortunately
+                //therefore I need the highest ID + 1:
+                int highestPosID = getHighestID("position","posID") + 1;
+                makeQuery("insert into position values ("+highestPosID+","+posEntity[0]+","+posEntity[1]+","
+                        +posEntity[2]+");");
 
                 //for the sysID of linkerEntity, it needs to be the ID of the system which you just made, which
                 //will be the highest one. Lucky we have a function for that
                 // we also need to know the ID of the position and velocity we just made, which are also the highest by chance:
 
-                int highestPosID = getHighestID("position","posID");
                 //System.out.println("the current highest pos ID is "+highestPosID);
                 int highestVelID = getHighestID("velocity","velID");
                 //System.out.println("the current highest vel ID is "+highestVelID);
                 //System.out.println("putting the new linker in");
-                int[] linkerEntity = {greatestID,linkingDetails.getInt(1),highestPosID,
+                int[] linkerEntity = {greatestSysID,linkingDetails.getInt(1),highestPosID,
                         highestVelID}; // bodyID, new sysID, new posID, new velID
 
                 //now to execute the queries:
@@ -211,6 +207,7 @@ public class MariaDBConnector {
         return name;
     }
 
+
     public static void deleteSystem(int id){
         //remove the system
         //remove the connections from bodies to that system
@@ -229,9 +226,8 @@ public class MariaDBConnector {
         //so getting all the bodies:
         ResultSet bodyIDs = makeQuery("select body.bodyID from body;");
         ResultSet bodyIDFromLinkerQueryResult = makeQuery("select bodyID from linker order by bodyID desc;");
-        int highestUsedId = -1;
+        //int highestUsedId = -1;
         try {
-
             //so first we need a list of all of the body IDs from the linker table:
             ArrayList<Integer> bodyIDLinkerArray = new ArrayList<>();
             int lastID = -1;
@@ -248,10 +244,10 @@ public class MariaDBConnector {
 
                 if(currentID != lastID){
                     bodyIDLinkerArray.add(currentID);
-                    if(currentID > highestUsedId){
-                        highestUsedId = currentID;
-                    }
-                    System.out.println("line 200 MariaDBConnector it was different to the last ID which is "+lastID);
+           //         if(currentID > highestUsedId){
+           //             highestUsedId = currentID;
+          //          }
+                   // System.out.println("line 200 MariaDBConnector it was different to the last ID which is "+lastID);
                 }
                 lastID = currentID;
             }
@@ -260,22 +256,22 @@ public class MariaDBConnector {
 
             while (bodyIDs.next()) {
                 int currentID = bodyIDs.getInt(1);
-                System.out.println("line 213 mariaDBConnector looking at body of ID "+currentID);
+               // System.out.println("line 213 mariaDBConnector looking at body of ID "+currentID);
                 //now we have the ID of the body, and all the IDs from the linker, so just loop through
                 //and remove the body if it is not needed
                 boolean isBeingUsed = false;
                 for(int bodyIDgiven : bodyIDLinkerArray){
-                    System.out.println("line 218 mariaDBConnector testing whether it is the same as "+bodyIDgiven);
+             //       System.out.println("line 218 mariaDBConnector testing whether it is the same as "+bodyIDgiven);
                     if(bodyIDgiven == currentID){
                         isBeingUsed = true;
-                        System.out.println("line 221 mariaDBConnector it was!");
+              //          System.out.println("line 221 mariaDBConnector it was!");
                     }
                 }
 
                 if(!isBeingUsed){
                     //now we need to remove the body with the current ID
                     makeQuery("delete from body where bodyID = "+currentID+";");
-              //      System.out.println("line 228 mariaDBConnector removing body of ID "+currentID);
+                    System.out.println("line 228 mariaDBConnector removing body of ID "+currentID);
                 }
             }
 
@@ -283,6 +279,7 @@ public class MariaDBConnector {
             //gaps between bodyIDs
 
             //to do that, I need to set the autoIncrement to the highest remaining bodyID:
+            int highestUsedId = getHighestID("body", "bodyID");
             makeQuery("alter table body AUTO_INCREMENT = "+(highestUsedId+1));
             //unfortunately for the highest used systemID I can't just find it without using other commands, and I don't
             //want to give this user more commands than possible, so I need to loop through all the systems and find the number
@@ -315,5 +312,14 @@ public class MariaDBConnector {
         catch (Exception e){
             System.out.println("error closing connection: "+e);
         }
+    }
+
+    public static int addNewSystem() {
+        //actually make the new system
+        makeQuery("insert into system (name) values (\"new system\");");
+        //get the ID of that
+
+        int idToReturn = getHighestID("system","systemID");
+        return idToReturn;
     }
 }
