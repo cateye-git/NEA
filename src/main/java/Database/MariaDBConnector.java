@@ -114,6 +114,43 @@ public class MariaDBConnector {
         return bodies;
     }
 
+    public static String[] getBodyNamesAndIdsFromSystem(int id){
+        int length = noOfEntries("system");
+        String[] bodyStuff = new String[length];
+        try{
+            // 1:bodyID 2:name 3:mass 4:radius 5:illumination 6:type 7-9:pos 10-12:vel
+            ResultSet bodyDetails = makeQuery("select body.bodyID, body.name from body, linker where body.bodyID = linker.bodyID and linker.systemID = "+id+";");
+            int counter = 0;
+            while(bodyDetails.next()){
+                String result = bodyDetails.getInt(1) + " " + bodyDetails.getString(2);
+                bodyStuff[counter] = result;
+                counter++;
+            }
+        }
+        catch (Exception e){
+            System.out.println("error fetching bodies: "+e);
+        }
+
+        return bodyStuff;
+    }
+
+    public static ArrayList<String> getAllBodies(){
+        ArrayList<String> bodyStuff = new ArrayList<>();
+        try{
+            // 1:bodyID 2:name 3:mass 4:radius 5:illumination 6:type 7-9:pos 10-12:vel
+            ResultSet bodyDetails = makeQuery("select bodyID, name from body;");
+            while(bodyDetails.next()){
+                String result = bodyDetails.getInt(1) + " " + bodyDetails.getString(2);
+                bodyStuff.add(result);
+            }
+        }
+        catch (Exception e){
+            System.out.println("error fetching bodies: "+e);
+        }
+
+        return bodyStuff;
+    }
+
     public static void copySystem(int id){
         try {
             String systemName = "";

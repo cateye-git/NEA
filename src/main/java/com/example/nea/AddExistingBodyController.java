@@ -1,8 +1,6 @@
 package com.example.nea;
 
 import Database.MariaDBConnector;
-import Interfaces.CRUDInterface;
-import Simulate.Body;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -10,16 +8,17 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ListView;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
-public class CreatorEditorController implements Initializable, CRUDInterface {
+public class AddExistingBodyController implements Initializable {
     @FXML
     private ListView<String> SelectBody;
-    private int idOfSelectedItem = -1;
-    private int idOfSystemToEdit;
+
+    private int idOfSelectedItem;
+    private int idOfSystemToEdit = -1;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
@@ -44,20 +43,37 @@ public class CreatorEditorController implements Initializable, CRUDInterface {
                 idOfSelectedItem = Integer.valueOf(stringParts[0]);
             }
         });
-
     }
+
+    @FXML
+    public void addExisting(ActionEvent e){
+        if(idOfSelectedItem != -1) {
+            //if have selected a body:
+            //so add the selected item to this database
+            //the problem is that this means adding a new Linker entity
+            //which requires an associated position and velocity.
+            //These fields will be different to the previously found ones
+            //so we need to send them to yet another screen where they can edit these positions and
+            //velocities
+        }
+    }
+
+    @FXML
+    public void addNew(ActionEvent e){
+        //so we need to send them
+    }
+
     public void gettingSystem(int sysID){
         idOfSystemToEdit = sysID;
         updateView();
     }
 
-    //this is the same as in CreatorSystemSelectController.
     private void updateView(){
         SelectBody.getSelectionModel().clearSelection();
         SelectBody.getItems().clear();
         //except this gets the bodies of that system
-        System.out.println("getting bodies ln 57 creatorEditor");
-        String[] bodies = getEntities();
+        System.out.println("getting bodies ln 56 AddExistingBodyController");
+        ArrayList<String> bodies = MariaDBConnector.getAllBodies();
         int noBodies = 0;
         for(String str : bodies){
             System.out.println("line 59 CreatorEditorController: " +str);
@@ -65,40 +81,12 @@ public class CreatorEditorController implements Initializable, CRUDInterface {
             noBodies++;
         }
         if(noBodies == 0){
-            //then there are no bodies in the system that we are looking at.
+            //then there are no bodies.
             //this is sort of a problem because the listview now is just white
             //there isn't much of a fix that is possible due to engine limitations
             //so I suppose I can't do much about it
+
+            //this also means that the user has managed to delete every existing body - I suppose that isn't entirely a bad thing but it's quite surprising.
         }
-    }
-
-    public String[] getEntities(){
-        return MariaDBConnector.getBodyNamesAndIdsFromSystem(idOfSystemToEdit);
-    }
-
-    @FXML
-    public void deleteSelected(ActionEvent e){
-        System.out.println("test");
-    }
-    @FXML
-    public void copySelected(ActionEvent e){
-
-    }
-    @FXML
-    private void onMainMenuClick(ActionEvent e){
-        try {
-            FXMLLoader.changeInExistingWindow(e, "mainMenuView.fxml");
-        } catch (IOException ex) {
-            throw new RuntimeException("there was a problem with returning to the menu from EditorController ln 69: " + ex);
-        }
-    }
-    @FXML
-    public void editSelected(ActionEvent e){
-
-    }
-    @FXML
-    public void addNew(ActionEvent e){
-        //send the user to the AddExistingBodyController page
-        //I will also need to give the page my ID so that it can return it to me when it loads me back up
     }
 }

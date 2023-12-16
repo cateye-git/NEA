@@ -1,6 +1,7 @@
 package com.example.nea;
 
 import Database.MariaDBConnector;
+import Interfaces.CRUDInterface;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -17,7 +18,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class CreatorSystemSelectController implements Initializable {
+public class CreatorSystemSelectController implements Initializable, CRUDInterface {
 
     @FXML
     private ListView<String> SelectSystemForSim;
@@ -44,24 +45,31 @@ public class CreatorSystemSelectController implements Initializable {
 
         try {
             //com.example.nea.FXMLLoader.changeInExistingWindow(event,"CreatorEditor.fxml");
-            Object classObject = loader.changeInExistingWindowReturnController(event, "CreatorEditor.fxml");
+            Object classObject = loader.changeInExistingWindowReturnController(event, editorName);
 
-            System.out.println(classObject.getClass().getName());
             CreatorEditorController controller = (CreatorEditorController) classObject.getClass().cast(classObject);
             controller.gettingSystem(id);
         } catch (IOException e) {
             throw new RuntimeException("there was a problem with loading that: "+e);
         }
-
     }
 
-    public void editSelected(ActionEvent event) throws IOException{
+    public void editSelected(ActionEvent event){
         if(currentlySelectedItem == -1){
             //user has not yet selected a system
             errorLabel.setText("please select a system");
         }
         else{
             //send to editor with ID of the one selected
+            try {
+                //com.example.nea.FXMLLoader.changeInExistingWindow(event,"CreatorEditor.fxml");
+                Object classObject = loader.changeInExistingWindowReturnController(event, editorName);
+
+                CreatorEditorController controller = (CreatorEditorController) classObject.getClass().cast(classObject);
+                controller.gettingSystem(currentlySelectedItem);
+            } catch (IOException e) {
+                throw new RuntimeException("there was a problem with loading that: "+e);
+            }
         }
 
     }
@@ -122,10 +130,14 @@ public class CreatorSystemSelectController implements Initializable {
     private void updateView(){
         SelectSystemForSim.getSelectionModel().clearSelection();
         SelectSystemForSim.getItems().clear();
-        String[] systems = MariaDBConnector.getSystems();
+        String[] systems = getEntities();
         for(String system : systems){
             System.out.println("line 114 CreatorSelectSystem: " +system);
             SelectSystemForSim.getItems().add(system);
         }
+    }
+    public String[] getEntities(){
+        String[] entities = MariaDBConnector.getSystems();
+        return entities;
     }
 }
