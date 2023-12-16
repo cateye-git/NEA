@@ -14,7 +14,7 @@ import java.util.ResourceBundle;
 
 public class AddExistingBodyController implements Initializable {
     @FXML
-    private ListView<String> SelectBody;
+    private ListView<DataStore> SelectBody;
 
     private int idOfSelectedItem;
     private int idOfSystemToEdit = -1;
@@ -27,20 +27,12 @@ public class AddExistingBodyController implements Initializable {
         //ID    name
 //         exactly the same as in SimulatorSystemSelectController.
         //updateView();
-        SelectBody.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+        SelectBody.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<DataStore>() {
             @Override
-            public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
+            public void changed(ObservableValue<? extends DataStore> observableValue, DataStore s, DataStore t1) {
                 //this is run whenever the user selects a different system.
-
-                //so now I need to change the currently selected system to that which has been selected,
-                //so I need the selected system ID
-                //the text is in the form "ID name" so I need to split by spaces and grab
-                //all of the stuff which is before the first space
-                //then convert it to an integer.
-
-                String selectedItemString = SelectBody.getSelectionModel().getSelectedItem();
-                String[] stringParts = selectedItemString.split(" ", 2);
-                idOfSelectedItem = Integer.valueOf(stringParts[0]);
+                //get the item, get its ID, put it in the correct location.
+                idOfSelectedItem = SelectBody.getSelectionModel().getSelectedItem().getIds()[0];
             }
         });
     }
@@ -72,15 +64,13 @@ public class AddExistingBodyController implements Initializable {
         SelectBody.getSelectionModel().clearSelection();
         SelectBody.getItems().clear();
         //except this gets the bodies of that system
-        System.out.println("getting bodies ln 56 AddExistingBodyController");
-        ArrayList<String> bodies = MariaDBConnector.getAllBodies();
-        int noBodies = 0;
-        for(String str : bodies){
-            System.out.println("line 59 CreatorEditorController: " +str);
-            SelectBody.getItems().add(str);
-            noBodies++;
+        System.out.println("getting bodies ln 67 AddExistingBodyController");
+        DataStore[] bodies = MariaDBConnector.getAllBodies();
+        for(DataStore body : bodies){
+            System.out.println("line 59 CreatorEditorController: " +body);
+            SelectBody.getItems().add(body);
         }
-        if(noBodies == 0){
+        if(bodies.length == 0){
             //then there are no bodies.
             //this is sort of a problem because the listview now is just white
             //there isn't much of a fix that is possible due to engine limitations

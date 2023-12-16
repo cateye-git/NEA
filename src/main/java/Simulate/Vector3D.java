@@ -58,6 +58,10 @@ public class Vector3D {
         return ref;
     }   //  return the name and all the components when the item is printed
 
+    public String returnComponentsAsString(){
+        return "("+components[0] + ", "+components[1]+", "+components[2]+")";
+    }
+
     public Vector3D(double x, double y, double z){
         components[0] = x;
         components[1] = y;

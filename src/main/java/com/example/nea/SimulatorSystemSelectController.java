@@ -1,3 +1,4 @@
+
 package com.example.nea;
 
 import Database.MariaDBConnector;
@@ -26,7 +27,7 @@ public class SimulatorSystemSelectController implements Initializable {
 
 
     @FXML
-    private ListView<String> SelectSystemForSim;
+    private ListView<DataStore> SelectSystemForSim;
 
     private Stage stage;
     private Scene scene;
@@ -35,13 +36,16 @@ public class SimulatorSystemSelectController implements Initializable {
     private int currentlySelectedItem = -1;
 
     public void onMainMenuClick(ActionEvent event) throws IOException {
-        //return to the main menu
+        //return to the main
+        com.example.nea.FXMLLoader.changeInExistingWindow(event,"mainMenuView.fxml");
+        /*
         root = FXMLLoader.load(getClass().getResource("mainMenuView.fxml"));
         stage = (Stage)((Node)event.getSource()).getScene().getWindow();
         scene = new Scene(root);
         scene.getStylesheets().add(getClass().getResource("/menus.css").toExternalForm());
         stage.setScene(scene);
         stage.show();
+         */
     }
 
     public void onSelectButtonCLicked(ActionEvent event) throws IOException{
@@ -58,6 +62,7 @@ public class SimulatorSystemSelectController implements Initializable {
 
             //load the menu for selecting interlopers
             com.example.nea.FXMLLoader.changeInExistingWindow(event, "InterloperTypeSelect.fxml");
+            Simulator.startUp(currentlySelectedItem,false,stage);
             /*
             root = FXMLLoader.load(getClass().getResource("InterloperTypeSelect.fxml"));
             stage = (Stage)((Node)event.getSource()).getScene().getWindow();
@@ -68,8 +73,8 @@ public class SimulatorSystemSelectController implements Initializable {
             Simulator.startUp(currentlySelectedItem, false, stage);
             //set our Stage to this new scene
             stage.show();
+            */
 
-             */
         }
         //if the currentlySelectedItem = -1, the default value, then
         //the user hasn't selected a system so do nothing.
@@ -81,26 +86,24 @@ public class SimulatorSystemSelectController implements Initializable {
 
         //this fetches all the Systems and formats them
 
-        String[] systems = MariaDBConnector.getSystems();
+        DataStore[] systems = MariaDBConnector.getSystems();
         //result is in form: systemID(int) name(String)
-        for(String system : systems){
+        for(DataStore system : systems){
             SelectSystemForSim.getItems().add(system);
         }
 
 
-        SelectSystemForSim.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+        SelectSystemForSim.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<DataStore>() {
             @Override
-            public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
+            public void changed(ObservableValue<? extends DataStore> observableValue, DataStore s, DataStore t1) {
                 //this means that whenever an item is selected it gets the index of that item in the list
                 //which just happens to be the SystemID. How convenient!
                 //currentlySelectedItem = SelectSystemForSim.getSelectionModel().getSelectedIndex() + 1;
 
                 //get the ID from the string of the selection
-                String selectedItemString = SelectSystemForSim.getSelectionModel().getSelectedItem();
-                String[] stringParts = selectedItemString.split(" ", 2);
-                int idOfSelected = Integer.valueOf(stringParts[0]);
-                currentlySelectedItem = idOfSelected;
+                currentlySelectedItem = SelectSystemForSim.getSelectionModel().getSelectedItem().getIds()[0];
             }
         });
     }
 }
+

@@ -4,6 +4,7 @@ import Simulate.Body;
 import Simulate.Planet;
 import Simulate.Star;
 import Simulate.Vector3D;
+import com.example.nea.DataStore;
 import org.w3c.dom.ls.LSOutput;
 
 import javax.xml.transform.Result;
@@ -63,17 +64,20 @@ public class MariaDBConnector {
         return ans;
     }
 
-    public static String[] getSystems(){
+    public static DataStore[] getSystems(){
         //System.out.println("finding length");
         int length = noOfEntries("system");
         //System.out.println("found length");
-        String[] ans = new String[length]; //make a string array of length no of systems
+        DataStore[] ans = new DataStore[length]; //make a string array of length no of systems
         //System.out.println("making query");
         ResultSet result = makeQuery("select * from system");
         try {
             int counter = 0;
             while (result.next()) {
-                ans[counter] = result.getInt(1) + "    " + result.getString(2);
+                int sysID = result.getInt(1);
+                String sysName = result.getString(2);
+
+                ans[counter] = new DataStore(sysID,sysName);
                 //System.out.println("line 77 MariaDBConnector: " +ans[counter]);
                 counter++;
             }
@@ -114,15 +118,34 @@ public class MariaDBConnector {
         return bodies;
     }
 
-    public static String[] getBodyNamesAndIdsFromSystem(int id){
-        int length = noOfEntries("system");
-        String[] bodyStuff = new String[length];
+    public static DataStore[] getBodyDataFromSystem(int id){
+        //the length component of this is a little harder - I need the length of the result of the query that
+        //I will execute:
+        ResultSet set = makeQuery("select bodyID from linker where linker.systemID = "+id+";");
+        int length = 0;
+        try {
+            while(set.next()){
+                length++;
+            }
+            System.out.println("Length is "+length+" line 128 creatorEditorController");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        DataStore[] bodyStuff = new DataStore[length];
         try{
             // 1:bodyID 2:name 3:mass 4:radius 5:illumination 6:type 7-9:pos 10-12:vel
-            ResultSet bodyDetails = makeQuery("select body.bodyID, body.name from body, linker where body.bodyID = linker.bodyID and linker.systemID = "+id+";");
+            ResultSet bodyDetails = makeQuery("select body.bodyID, linker.posID, linker.velID,posX, posY,posZ,velX,velY,velZ, " +
+                    "body.name from body, linker, position, velocity where body.bodyID = linker.bodyID and " +
+                    "linker.systemID = "+id+" and velocity.velID = linker.velID and position.posID = linker.posID;");
             int counter = 0;
             while(bodyDetails.next()){
-                String result = bodyDetails.getInt(1) + " " + bodyDetails.getString(2);
+                Vector3D pos = new Vector3D(bodyDetails.getInt(4),bodyDetails.getInt(5),bodyDetails.getInt(6));
+                Vector3D vel = new Vector3D(bodyDetails.getInt(7),bodyDetails.getInt(8),bodyDetails.getInt(9));
+
+                int[] ids = {bodyDetails.getInt(1),bodyDetails.getInt(2),bodyDetails.getInt(3)};
+                String prettyString = bodyDetails.getString(10) + pos.returnComponentsAsString()+" "+vel.returnComponentsAsString();
+
+                DataStore result = new DataStore(ids,prettyString);
                 bodyStuff[counter] = result;
                 counter++;
             }
@@ -130,18 +153,17 @@ public class MariaDBConnector {
         catch (Exception e){
             System.out.println("error fetching bodies: "+e);
         }
-
         return bodyStuff;
     }
 
-    public static ArrayList<String> getAllBodies(){
-        ArrayList<String> bodyStuff = new ArrayList<>();
+    public static DataStore[] getAllBodies(){
+        DataStore[] bodyStuff = new DataStore[noOfEntries("body")];
         try{
             // 1:bodyID 2:name 3:mass 4:radius 5:illumination 6:type 7-9:pos 10-12:vel
             ResultSet bodyDetails = makeQuery("select bodyID, name from body;");
+            int counter = 0;
             while(bodyDetails.next()){
-                String result = bodyDetails.getInt(1) + " " + bodyDetails.getString(2);
-                bodyStuff.add(result);
+                bodyStuff[counter] = new DataStore(bodyDetails.getInt(1),bodyDetails.getString(2));
             }
         }
         catch (Exception e){
@@ -321,8 +343,8 @@ public class MariaDBConnector {
             //unfortunately for the highest used systemID I can't just find it without using other commands, and I don't
             //want to give this user more commands than possible, so I need to loop through all the systems and find the number
 
-            String[] systems = getSystems();
-            int autoIncrementValueSystem = systems.length + 1;
+            int noSystems = noOfEntries("system");
+            int autoIncrementValueSystem = noSystems + 1;
             //if there were 2 systems, I want the autoIncrement to be set to 3
             //length of systems is going to be 2
             System.out.println("line 242 mariaDBConnector setting autoIncrement of system to "+autoIncrementValueSystem);
@@ -358,5 +380,9 @@ public class MariaDBConnector {
 
         int idToReturn = getHighestID("system","systemID");
         return idToReturn;
+    }
+
+    public static void deleteBodyFromSystem(int bodyID, int posID, int velID) {
+        //
     }
 }

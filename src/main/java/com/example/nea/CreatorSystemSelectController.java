@@ -21,7 +21,7 @@ import java.util.ResourceBundle;
 public class CreatorSystemSelectController implements Initializable, CRUDInterface {
 
     @FXML
-    private ListView<String> SelectSystemForSim;
+    private ListView<DataStore> SelectSystemForSim;
 
     private final String editorName = "CreatorEditor.fxml";
 
@@ -105,7 +105,16 @@ public class CreatorSystemSelectController implements Initializable, CRUDInterfa
         //ID    name
 //         exactly the same as in SimulatorSystemSelectController.
         updateView();
-        SelectSystemForSim.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+        SelectSystemForSim.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<DataStore>() {
+            @Override
+            public void changed(ObservableValue<? extends DataStore> observable, DataStore oldValue, DataStore newValue) {
+                //run when the system selected has changed
+
+                //so I need to get the IDs for the systems, which is made easy with my DataStore component
+
+                currentlySelectedItem = SelectSystemForSim.getSelectionModel().getSelectedItem().getIds()[0];
+            }
+/*
             @Override
             public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
                 //this is run whenever the user selects a different system.
@@ -117,27 +126,30 @@ public class CreatorSystemSelectController implements Initializable, CRUDInterfa
                 //then convert it to an integer.
                 String selectedItemString = "-1 failure";
                 try{
-                 selectedItemString = SelectSystemForSim.getSelectionModel().getSelectedItem();}
-                catch (Exception e){
-                }
+                 //selectedItemString = SelectSystemForSim.getSelectionModel().getSelectedItem();}
+             //   catch (Exception e){
+             //   }
                 String[] stringParts = selectedItemString.split(" ", 2);
                 int idOfSelected = Integer.valueOf(stringParts[0]);
                 currentlySelectedItem = idOfSelected;
+
+
             }
+                */
         });
     }
 
     private void updateView(){
         SelectSystemForSim.getSelectionModel().clearSelection();
         SelectSystemForSim.getItems().clear();
-        String[] systems = getEntities();
-        for(String system : systems){
+        DataStore[] systems = getEntities();
+        for(DataStore system : systems){
             System.out.println("line 114 CreatorSelectSystem: " +system);
             SelectSystemForSim.getItems().add(system);
         }
     }
-    public String[] getEntities(){
-        String[] entities = MariaDBConnector.getSystems();
+    public DataStore[] getEntities(){
+        DataStore[] entities = MariaDBConnector.getSystems();
         return entities;
     }
 }

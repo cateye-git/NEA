@@ -2,7 +2,6 @@ package com.example.nea;
 
 import Database.MariaDBConnector;
 import Interfaces.CRUDInterface;
-import Simulate.Body;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -12,13 +11,12 @@ import javafx.scene.control.ListView;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class CreatorEditorController implements Initializable, CRUDInterface {
     @FXML
-    private ListView<String> SelectBody;
-    private int idOfSelectedItem = -1;
+    private ListView<DataStore> SelectBody;
+    private int[] idsOfSelectedItem = {-1,-1,-1}; //bodyID, posID, velID
     private int idOfSystemToEdit;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -28,20 +26,16 @@ public class CreatorEditorController implements Initializable, CRUDInterface {
         //ID    name
 //         exactly the same as in SimulatorSystemSelectController.
         //updateView();
-        SelectBody.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+        SelectBody.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<DataStore>() {
             @Override
-            public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
+            public void changed(ObservableValue<? extends DataStore> observableValue, DataStore s, DataStore t1) {
                 //this is run whenever the user selects a different system.
 
                 //so now I need to change the currently selected system to that which has been selected,
-                //so I need the selected system ID
-                //the text is in the form "ID name" so I need to split by spaces and grab
-                //all of the stuff which is before the first space
-                //then convert it to an integer.
+                //because of my DataStore class this is really easy because I can literally just fetch it
 
-                String selectedItemString = SelectBody.getSelectionModel().getSelectedItem();
-                String[] stringParts = selectedItemString.split(" ", 2);
-                idOfSelectedItem = Integer.valueOf(stringParts[0]);
+                DataStore selectedItem = SelectBody.getSelectionModel().getSelectedItem();
+                idsOfSelectedItem = selectedItem.getIds();
             }
         });
 
@@ -57,11 +51,12 @@ public class CreatorEditorController implements Initializable, CRUDInterface {
         SelectBody.getItems().clear();
         //except this gets the bodies of that system
         System.out.println("getting bodies ln 57 creatorEditor");
-        String[] bodies = getEntities();
+        DataStore[] bodies = getEntities();
         int noBodies = 0;
-        for(String str : bodies){
-            System.out.println("line 59 CreatorEditorController: " +str);
-            SelectBody.getItems().add(str);
+        for(DataStore bodyDets : bodies){
+            System.out.println("line 59 CreatorEditorController: " +bodyDets);
+            //bodyDetID in form: bodyID,
+            SelectBody.getItems().add(bodyDets);
             noBodies++;
         }
         if(noBodies == 0){
@@ -72,13 +67,15 @@ public class CreatorEditorController implements Initializable, CRUDInterface {
         }
     }
 
-    public String[] getEntities(){
-        return MariaDBConnector.getBodyNamesAndIdsFromSystem(idOfSystemToEdit);
+    public DataStore[] getEntities(){
+        return MariaDBConnector.getBodyDataFromSystem(idOfSystemToEdit);
     }
 
     @FXML
     public void deleteSelected(ActionEvent e){
-        System.out.println("test");
+        //delete the linkage between the Body and the system as well as the position and velocity
+        //MariaDBConnector.deleteBodyFromSystem(idOfSelectedItem);
+        //then delete any bodies that have no connections
     }
     @FXML
     public void copySelected(ActionEvent e){
