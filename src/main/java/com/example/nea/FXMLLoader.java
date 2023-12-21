@@ -40,4 +40,14 @@ public class FXMLLoader {
         //Class test = scene.getClass();
         //System.out.println(test);
     }
+
+    public static Stage changeInExistingWindowReturnStage(ActionEvent event, String fileName) throws  IOException{
+        Parent root = javafx.fxml.FXMLLoader.load(FXMLLoader.class.getResource(fileName));
+        Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
+        Scene scene = new Scene(root);
+        scene.getStylesheets().add(FXMLLoader.class.getResource(CSS).toExternalForm());
+        stage.setScene(scene);
+        stage.show();
+        return stage;
+    }
 }

@@ -158,12 +158,14 @@ public class MariaDBConnector {
 
     public static DataStore[] getAllBodies(){
         DataStore[] bodyStuff = new DataStore[noOfEntries("body")];
+        //System.out.println("ln 161 mariadb getting all bodies, no = "+bodyStuff.length);
         try{
             // 1:bodyID 2:name 3:mass 4:radius 5:illumination 6:type 7-9:pos 10-12:vel
             ResultSet bodyDetails = makeQuery("select bodyID, name from body;");
             int counter = 0;
             while(bodyDetails.next()){
                 bodyStuff[counter] = new DataStore(bodyDetails.getInt(1),bodyDetails.getString(2));
+                counter++;
             }
         }
         catch (Exception e){
@@ -173,6 +175,111 @@ public class MariaDBConnector {
         return bodyStuff;
     }
 
+    public static int addNewPos(double posX, double posY, double posZ){//returns the ID of the position made
+        int posID = getHighestID("position","posID")+1;
+        makeQuery("insert into position values ("+posID+","+posX+","+posY+","+","+posZ+");");
+        return posID;
+    }
+    public static int addNewVel(double velX, double velY, double velZ){//returns the ID of the position made
+        int velID = getHighestID("velocity","velID")+1;
+        makeQuery("insert into position values ("+velID+","+velX+","+velY+","+","+velZ+");");
+        return velID;
+    }
+
+    public static void copySystemBodyLink(int bodyID, int sysID, int posID, int velID){
+        //make the new IDs:
+        //I wouldn't normally do this because SQL likes to do this itself and why should I ruin its fun
+        //but I will need these IDs so that I can add the new linker object
+        int newPosID = getHighestID("position","posID") + 1;
+        int newVelID = getHighestID("velocity", "velID") + 1;
+
+        //then we need to get the data to copy
+
+        try {
+            Vector3D pos = getPos(posID);
+            Vector3D vel = getVel(velID);
+
+            //ok we have the data to copy now, so we need to actually copy it.
+            //first make the new position and velocity:
+            makeQuery("insert into position velues ("+newPosID+", "+pos.getComponent(0)+","+pos.getComponent(1)+","+pos.getComponent(2)+");");
+            makeQuery("insert into velocity values ("+newVelID+", "+vel.getComponent(0)+","+vel.getComponent(1)+","+vel.getComponent(2)+");");
+            //we don't need to spawn in a new body because we are just making a new linker
+            //so all that is left is to make said linker:
+            makeQuery("insert into linker values ("+bodyID+","+sysID+","+newPosID+","+newVelID+");");
+            //and we are done.
+        }
+        catch (Exception e){
+            System.out.println("problemt at line 190 mariaDB connector copying a system body link: "+e);
+        }
+
+    }
+    public static void copySystemBodyLink(int bodyID, int sysID, double posX,double posY, double posZ, double velX, double velY, double velZ){
+        //make the new IDs:
+        int newPosID = getHighestID("position","posID") + 1;
+        int newVelID = getHighestID("velocity", "velID") + 1;
+
+        //then we need to get the data to copy
+
+        try {
+            //ok we have the data to copy now, so we need to actually copy it.
+            //first make the new position and velocity:
+            makeQuery("insert into position values ("+newPosID+", "+posX+","+posY+","+posZ+");");
+            makeQuery("insert into velocity values ("+newVelID+", "+velX+","+velY+","+velZ+");");
+            //we don't need to spawn in a new body because we are just making a new linker
+            //so all that is left is to make said linker:
+            makeQuery("insert into linker values ("+bodyID+","+sysID+","+newPosID+","+newVelID+");");
+            //and we are done.
+        }
+        catch (Exception e){
+            System.out.println("problem at line 234 mariaDB connector copying a new system body link: "+e);
+        }
+
+    }//for if there isn't a position yet
+
+    private static Vector3D getPos(int posID) throws Exception{
+        ResultSet posDets = makeQuery("select posX, posY, posZ from position where posID = "+posID+";");
+        Vector3D result = new Vector3D(0,0,0);
+        while (posDets.next()){
+            result.setComponent(0,posDets.getInt(1));
+            result.setComponent(1,posDets.getInt(2));
+            result.setComponent(2,posDets.getInt(3));
+        }
+        return result;
+    }
+    private static Vector3D getVel(int velID) throws Exception{
+        ResultSet velDets = makeQuery("select velX, velY, velZ from position where velID = "+velID+";");
+        Vector3D result = new Vector3D(0,0,0);
+        while (velDets.next()){
+            result.setComponent(0,velDets.getInt(1));
+            result.setComponent(1,velDets.getInt(2));
+            result.setComponent(2,velDets.getInt(3));
+        }
+        return result;
+    }
+    private static Body getBody(int bodyID) throws Exception{
+        ResultSet bodyDets = makeQuery("select * from body where bodyID = "+bodyID+";");
+        Body returnBody = new Body(0,0,0,0,0,0,"unnamed",0,0,false);
+        while (bodyDets.next()){
+            //bodyID  name  mass  radius  illumination  type
+            String type = bodyDets.getString(6);
+            String name = bodyDets.getString(2);
+            //int id = bodyDets.getInt(1);
+            double mass = bodyDets.getInt(3);
+            double radius = bodyDets.getInt(4);
+
+            if(type == "star"){
+                double illumination = bodyDets.getInt(5);
+                returnBody = new Star(0,0,0,0,0,0,name,mass,radius,true,illumination);
+            }
+            else if (type == "planet"){
+                returnBody = new Planet(0,0,0,0,0,0,name,mass,radius,true);
+            }
+            else{
+                returnBody = new Body(0,0,0,0,0,0,name,mass,radius,true);
+            }
+        }
+        return returnBody;
+    }
     public static void copySystem(int id){
         try {
             String systemName = "";
@@ -279,6 +386,8 @@ public class MariaDBConnector {
 
 
         //now for the hard part
+        removeUnusedBodies();
+        /*
         //so remove all bodies which don't have any connections to any systems
         //so this requires looping through each body in the system, and checking that at least one linker entity
         //has the bodyID of that body
@@ -349,8 +458,88 @@ public class MariaDBConnector {
             //length of systems is going to be 2
             System.out.println("line 242 mariaDBConnector setting autoIncrement of system to "+autoIncrementValueSystem);
             makeQuery("alter table system AUTO_INCREMENT = "+autoIncrementValueSystem);
+
+
         }catch (Exception e){
             System.out.println("line 245 mariaDBConnector exception in getting all IDs relating to system "+id);
+        }
+
+         */
+    }
+
+    public static void removeUnusedBodies() {
+        //so remove all bodies which don't have any connections to any systems
+        //so this requires looping through each body in the system, and checking that at least one linker entity
+        //has the bodyID of that body
+        //so getting all the bodies:
+        ResultSet bodyIDs = makeQuery("select body.bodyID from body;");
+        ResultSet bodyIDFromLinkerQueryResult = makeQuery("select bodyID from linker order by bodyID desc;");
+        //int highestUsedId = -1;
+        try {
+            //so first we need a list of all of the body IDs from the linker table:
+            ArrayList<Integer> bodyIDLinkerArray = new ArrayList<>();
+            int lastID = -1;
+            while (bodyIDFromLinkerQueryResult.next()) {
+                //so loop through all of the bodyIDs from the linker table and add them to a list
+                //the thing is this would yield a lot of repeats, significantly increasing the time taken to execute all queries
+                //as we run through this list several times
+                //therefore we don't need repeats
+                //this is why I have ordered by the bodyID, so we can look at the last ID and only add the current ID to the list if
+                //it is different to the past one
+                int currentID = bodyIDFromLinkerQueryResult.getInt(1);
+
+                //System.out.println("line 195 MariaDBConnector testing body from linker of ID "+currentID);
+
+                if (currentID != lastID) {
+                    bodyIDLinkerArray.add(currentID);
+                    //         if(currentID > highestUsedId){
+                    //             highestUsedId = currentID;
+                    //          }
+                    // System.out.println("line 200 MariaDBConnector it was different to the last ID which is "+lastID);
+                }
+                lastID = currentID;
+            }
+            //now we have a list of all of the bodyIDs used with linkers.
+
+
+            while (bodyIDs.next()) {
+                int currentID = bodyIDs.getInt(1);
+                // System.out.println("line 213 mariaDBConnector looking at body of ID "+currentID);
+                //now we have the ID of the body, and all the IDs from the linker, so just loop through
+                //and remove the body if it is not needed
+                boolean isBeingUsed = false;
+                for (int bodyIDgiven : bodyIDLinkerArray) {
+                    //       System.out.println("line 218 mariaDBConnector testing whether it is the same as "+bodyIDgiven);
+                    if (bodyIDgiven == currentID) {
+                        isBeingUsed = true;
+                        //          System.out.println("line 221 mariaDBConnector it was!");
+                    }
+                }
+
+                if (!isBeingUsed) {
+                    //now we need to remove the body with the current ID
+                    makeQuery("delete from body where bodyID = " + currentID + ";");
+                    System.out.println("line 228 mariaDBConnector removing body of ID " + currentID);
+                }
+            }
+
+            //after doing all this, I need to change the autoIncrement angle for the bodies so that I don't get random
+            //gaps between bodyIDs
+
+            //to do that, I need to set the autoIncrement to the highest remaining bodyID:
+            int highestUsedId = getHighestID("body", "bodyID");
+            makeQuery("alter table body AUTO_INCREMENT = " + (highestUsedId + 1));
+            //unfortunately for the highest used systemID I can't just find it without using other commands, and I don't
+            //want to give this user more commands than possible, so I need to loop through all the systems and find the number
+
+            int noSystems = noOfEntries("system");
+            int autoIncrementValueSystem = noSystems + 1;
+            //if there were 2 systems, I want the autoIncrement to be set to 3
+            //length of systems is going to be 2
+            System.out.println("line 242 mariaDBConnector setting autoIncrement of system to " + autoIncrementValueSystem);
+            makeQuery("alter table system AUTO_INCREMENT = " + autoIncrementValueSystem);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -382,7 +571,18 @@ public class MariaDBConnector {
         return idToReturn;
     }
 
-    public static void deleteBodyFromSystem(int bodyID, int posID, int velID) {
-        //
+    public static void deleteBodyFromSystem(int bodyID,int sysID, int posID, int velID) {
+        //so we need to delete the position, velocity and linker
+        //delete from the linker first so that no elements are relying on it.
+        //i could uniquely identify the link with the pos and vel IDs, but this isnt very robust so i use
+        //the body and system
+        makeQuery("delete from linker where bodyID = "+bodyID+" and systemID = "+sysID+" and posID = "+posID+" and velID = "+velID+";");
+        makeQuery("delete from velocity where velID = "+velID+";");
+        makeQuery("delete from position where posID = "+posID+";");
+        //then change the autoIncrement:
+        makeQuery("alter table velocity auto_increment = "+getHighestID("velocity","velID")+1+";");
+        makeQuery("alter table position auto_increment = "+getHighestID("position","posID")+1+";");
+        //now remove the rest of the bodies that aren't needed
+        removeUnusedBodies();
     }
 }

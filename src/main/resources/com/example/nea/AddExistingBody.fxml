@@ -1,23 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<?import javafx.scene.text.Font?>
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.example.nea.AddExistingBodyController"
-            prefHeight="650.0" prefWidth="1000.0">
+<AnchorPane prefHeight="650.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.nea.AddExistingBodyController">
     <ListView fx:id="SelectBody" fixedCellSize="50.0" layoutX="372.0" layoutY="26.0" prefHeight="613.0" prefWidth="617.0" />
     <Button layoutX="14.0" layoutY="150.0" mnemonicParsing="false" onAction="#addNew" prefHeight="90.0" prefWidth="350.0" text="Add new" />
-    <Button layoutX="14.0" layoutY="250.0" mnemonicParsing="false" onAction="#addExisting" prefHeight="90.0" prefWidth="350.0" text="Add selected" />
+    <Button layoutX="14.0" layoutY="325.0" mnemonicParsing="false" onAction="#addExisting" prefHeight="90.0" prefWidth="350.0" text="Add selected" />
     <Label layoutX="75.0" layoutY="64.0" prefHeight="62.0" prefWidth="227.0" text="Body Adder" textFill="WHITE">
         <font>
             <Font size="40.0" />
         </font>
     </Label>
+   <Label layoutX="14.0" layoutY="415.0" prefHeight="27.0" prefWidth="227.0" text="At pos:" textFill="WHITE">
+      <font>
+         <Font size="14.0" />
+      </font>
+   </Label>
+   <TextField fx:id="posXField" layoutX="14.0" layoutY="452.0" prefHeight="27.0" prefWidth="90.0" promptText="posX" />
+   <TextField fx:id="posYField" layoutX="144.0" layoutY="452.0" prefHeight="27.0" prefWidth="90.0" promptText="posY" />
+   <TextField fx:id="posZField" layoutX="274.0" layoutY="452.0" prefHeight="27.0" prefWidth="90.0" promptText="posZ" />
+   <Label layoutX="14.0" layoutY="479.0" prefHeight="27.0" prefWidth="227.0" text="and initial vel:" textFill="WHITE">
+      <font>
+         <Font size="14.0" />
+      </font>
+   </Label>
+   <TextField fx:id="velXField" layoutX="14.0" layoutY="506.0" prefHeight="27.0" prefWidth="90.0" promptText="velX" />
+   <TextField fx:id="velYField" layoutX="144.0" layoutY="506.0" prefHeight="27.0" prefWidth="90.0" promptText="velZ" />
+   <TextField fx:id="velZField" layoutX="274.0" layoutY="506.0" prefHeight="27.0" prefWidth="90.0" promptText="velZ" />
 
 </AnchorPane>

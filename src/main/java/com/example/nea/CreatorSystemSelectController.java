@@ -47,8 +47,8 @@ public class CreatorSystemSelectController implements Initializable, CRUDInterfa
             //com.example.nea.FXMLLoader.changeInExistingWindow(event,"CreatorEditor.fxml");
             Object classObject = loader.changeInExistingWindowReturnController(event, editorName);
 
-            CreatorEditorController controller = (CreatorEditorController) classObject.getClass().cast(classObject);
-            controller.gettingSystem(id);
+        //    CreatorEditorController controller = (CreatorEditorController) classObject.getClass().cast(classObject);
+          //  controller.gettingSystem(id);
         } catch (IOException e) {
             throw new RuntimeException("there was a problem with loading that: "+e);
         }
@@ -63,10 +63,11 @@ public class CreatorSystemSelectController implements Initializable, CRUDInterfa
             //send to editor with ID of the one selected
             try {
                 //com.example.nea.FXMLLoader.changeInExistingWindow(event,"CreatorEditor.fxml");
+                CreatorDataStorage.setSystemID(currentlySelectedItem);
                 Object classObject = loader.changeInExistingWindowReturnController(event, editorName);
 
-                CreatorEditorController controller = (CreatorEditorController) classObject.getClass().cast(classObject);
-                controller.gettingSystem(currentlySelectedItem);
+                //CreatorEditorController controller = (CreatorEditorController) classObject.getClass().cast(classObject);
+                //controller.gettingSystem(currentlySelectedItem);
             } catch (IOException e) {
                 throw new RuntimeException("there was a problem with loading that: "+e);
             }

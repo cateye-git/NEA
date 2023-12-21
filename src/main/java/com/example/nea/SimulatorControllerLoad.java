@@ -34,7 +34,7 @@ public class SimulatorControllerLoad {
         //scene.getStylesheets().add(css);
         scene.getStylesheets().add(getClass().getResource("/menus.css").toExternalForm());
 
-
+        System.out.println("loading a stage SimulatorControllerLoad line 37");
         stage.setTitle(title);
         stage.setScene(scene);
         stage.show();

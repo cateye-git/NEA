@@ -64,6 +64,7 @@ public class Simulator3DClass {
 
         //close this window for the user
         //stop application from still running
+        System.out.println("line 67 Simulator3DClass stopping all");
         timer.stop();
         myStage.close();
         Simulator.endSimulation(timeElapsed);

@@ -61,7 +61,8 @@ public class SimulatorSystemSelectController implements Initializable {
 
 
             //load the menu for selecting interlopers
-            com.example.nea.FXMLLoader.changeInExistingWindow(event, "InterloperTypeSelect.fxml");
+            //un
+            stage = com.example.nea.FXMLLoader.changeInExistingWindowReturnStage(event, "InterloperTypeSelect.fxml");
             Simulator.startUp(currentlySelectedItem,false,stage);
             /*
             root = FXMLLoader.load(getClass().getResource("InterloperTypeSelect.fxml"));

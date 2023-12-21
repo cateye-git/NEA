@@ -36,6 +36,7 @@ public class _3DBodySimulatorController implements Initializable {
 
     public void closeSim(ActionEvent event) throws Exception {
         //Simulator.endSimulation();
+        System.out.println("line 39 3dBodySimulatorController - stopping system");
         Simulation.stopAll();
         timer.stop();
     }

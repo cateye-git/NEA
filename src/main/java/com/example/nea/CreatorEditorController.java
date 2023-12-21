@@ -26,6 +26,7 @@ public class CreatorEditorController implements Initializable, CRUDInterface {
         //ID    name
 //         exactly the same as in SimulatorSystemSelectController.
         //updateView();
+        gettingSystem();
         SelectBody.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<DataStore>() {
             @Override
             public void changed(ObservableValue<? extends DataStore> observableValue, DataStore s, DataStore t1) {
@@ -40,8 +41,14 @@ public class CreatorEditorController implements Initializable, CRUDInterface {
         });
 
     }
+    /*
     public void gettingSystem(int sysID){
         idOfSystemToEdit = sysID;
+        updateView();
+    }
+     */
+    public void gettingSystem(){
+        idOfSystemToEdit = CreatorDataStorage.getSystemID();
         updateView();
     }
 
@@ -73,20 +80,36 @@ public class CreatorEditorController implements Initializable, CRUDInterface {
 
     @FXML
     public void deleteSelected(ActionEvent e){
-        //delete the linkage between the Body and the system as well as the position and velocity
-        //MariaDBConnector.deleteBodyFromSystem(idOfSelectedItem);
-        //then delete any bodies that have no connections
+        if(checkCurrentlySelectedNeg() == false) {
+            //delete the linkage between the Body and the system as well as the position and velocity
+            MariaDBConnector.deleteBodyFromSystem(idsOfSelectedItem[0], idOfSystemToEdit, idsOfSelectedItem[1], idsOfSelectedItem[2]);
+            //then delete any bodies that have no connections
+        }
     }
     @FXML
     public void copySelected(ActionEvent e){
+        //if selecting something
+        if(checkCurrentlySelectedNeg() == false){
+            //then make new position and velocity, and link the body to the system with that velocity
+            MariaDBConnector.copySystemBodyLink(idsOfSelectedItem[0],idOfSystemToEdit,idsOfSelectedItem[1],idsOfSelectedItem[2]);
+        }
+    }
 
+    private boolean checkCurrentlySelectedNeg(){
+        boolean isNeg = false;
+        for(int id : idsOfSelectedItem){
+            if(id == -1){
+                isNeg = true;
+            }
+        }
+        return isNeg;
     }
     @FXML
     private void onMainMenuClick(ActionEvent e){
         try {
             FXMLLoader.changeInExistingWindow(e, "mainMenuView.fxml");
         } catch (IOException ex) {
-            throw new RuntimeException("there was a problem with returning to the menu from EditorController ln 69: " + ex);
+            throw new RuntimeException("there was a problem with returning to the menu from EditorController ln 105: " + ex);
         }
     }
     @FXML
@@ -97,5 +120,14 @@ public class CreatorEditorController implements Initializable, CRUDInterface {
     public void addNew(ActionEvent e){
         //send the user to the AddExistingBodyController page
         //I will also need to give the page my ID so that it can return it to me when it loads me back up
+            try {
+                FXMLLoader.changeInExistingWindow(e, "AddExistingBody.fxml");
+
+               // AddExistingBodyController controller = AddExistingBodyController.class.cast(classObj);
+               // controller.gettingSystem(idOfSystemToEdit);
+            } catch (Exception ex) {
+                throw new RuntimeException("there was a problem with loading the controller at ln 122 CreatorEditorController: "+ex);
+            }
+
     }
 }

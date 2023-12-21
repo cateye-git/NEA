@@ -7,6 +7,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -15,6 +16,18 @@ import java.util.ResourceBundle;
 public class AddExistingBodyController implements Initializable {
     @FXML
     private ListView<DataStore> SelectBody;
+    @FXML
+    private TextField posXField;
+    @FXML
+    private TextField posYField;
+    @FXML
+    private TextField posZField;
+    @FXML
+    private TextField velXField;
+    @FXML
+    private TextField velYField;
+    @FXML
+    private TextField velZField;
 
     private int idOfSelectedItem;
     private int idOfSystemToEdit = -1;
@@ -27,6 +40,7 @@ public class AddExistingBodyController implements Initializable {
         //ID    name
 //         exactly the same as in SimulatorSystemSelectController.
         //updateView();
+        gettingSystem();
         SelectBody.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<DataStore>() {
             @Override
             public void changed(ObservableValue<? extends DataStore> observableValue, DataStore s, DataStore t1) {
@@ -41,22 +55,34 @@ public class AddExistingBodyController implements Initializable {
     public void addExisting(ActionEvent e){
         if(idOfSelectedItem != -1) {
             //if have selected a body:
-            //so add the selected item to this database
+            //so add the selected item to this system
             //the problem is that this means adding a new Linker entity
             //which requires an associated position and velocity.
             //These fields will be different to the previously found ones
             //so we need to send them to yet another screen where they can edit these positions and
             //velocities
+            //and this new scene will have to
+            try {
+                MariaDBConnector.copySystemBodyLink(idOfSelectedItem, idOfSystemToEdit, Double.valueOf(posXField.getText()), Double.valueOf(posYField.getText()),
+                        Double.valueOf(posZField.getText()), Double.valueOf(velXField.getText()), Double.valueOf(velYField.getText()), Double.valueOf(velZField.getText()));
+                //now we need to send the user back to the editor.
+                FXMLLoader.changeInExistingWindow(e, "CreatorEditor.fxml");
+            }
+            catch (Exception ex){
+                //this is probably because the user has managed to type an illegitimate position or velocity name in here
+                //therefore do not do anything
+                System.out.println("error at ln 74 addexistingbody "+ex);
+            }
         }
     }
 
     @FXML
     public void addNew(ActionEvent e){
-        //so we need to send them
+        //so we need to send them to the AddNewBody
     }
 
-    public void gettingSystem(int sysID){
-        idOfSystemToEdit = sysID;
+    public void gettingSystem(){
+        idOfSystemToEdit = CreatorDataStorage.getSystemID();
         updateView();
     }
 

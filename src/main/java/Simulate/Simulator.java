@@ -157,8 +157,10 @@ public class Simulator {        //will not let me set it to static???
     static private double significanceCuttoff = 1e5;
     static private double significanceMultiplier = 1e-5;
     public static void endSimulation(double time){
+        System.out.println("Simulator line 160 ending simulation");
         loader = new SimulatorControllerLoad(stage);
         fileOps.closeOutputFileHandle();
+        System.out.println("Simulator line 163 ending simulation still");
 
         //there are 3 possibilities in this scenario:
         // 1: the user just wants to leave
