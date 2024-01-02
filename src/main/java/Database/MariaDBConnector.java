@@ -4,6 +4,7 @@ import Simulate.Body;
 import Simulate.Planet;
 import Simulate.Star;
 import Simulate.Vector3D;
+import com.example.nea.CreatorDataStorage;
 import com.example.nea.DataStore;
 import org.w3c.dom.ls.LSOutput;
 
@@ -156,6 +157,26 @@ public class MariaDBConnector {
         return bodyStuff;
     }
 
+    private static void addNewBody(int id, String name, double mass, double radius, double illumination, String type){
+        makeQuery("insert into body values ("+id+",\""+name+"\","+mass+","+radius+","+illumination+",\""+type+"\");");
+    }
+    private static void addNewLinker(int bodyID, int sysID, int posID, int velID){
+        makeQuery("insert into linker values ("+bodyID+","+sysID+","+posID+","+velID+");");
+    }
+    public static void addNewBodyToSystem(String name, double mass, double radius, double illumination, String type, Vector3D pos, Vector3D vel,int sysID){
+        //make the new IDs:
+        int newPosID = getHighestID("position","posID") + 1;
+        int newVelID = getHighestID("velocity", "velID") + 1;
+        int newBodyID = getHighestID("body","bodyID") + 1;
+
+        //System.out.println("adding to position ln 168 MariaDBConnector");
+        addNewPos(newPosID,pos.getComponent(0),pos.getComponent(1),pos.getComponent(2));
+        //System.out.println("adding to velocity ln 170 MariaDBConnector");
+        addNewVel(newVelID,vel.getComponent(0),vel.getComponent(1),vel.getComponent(2));
+        addNewBody(newBodyID,name,mass,radius,illumination,type);
+        //now we need to add the linker object
+        addNewLinker(newBodyID,sysID, newPosID, newVelID);
+    }
     public static DataStore[] getAllBodies(){
         DataStore[] bodyStuff = new DataStore[noOfEntries("body")];
         //System.out.println("ln 161 mariadb getting all bodies, no = "+bodyStuff.length);
@@ -175,16 +196,17 @@ public class MariaDBConnector {
         return bodyStuff;
     }
 
-    public static int addNewPos(double posX, double posY, double posZ){//returns the ID of the position made
-        int posID = getHighestID("position","posID")+1;
-        makeQuery("insert into position values ("+posID+","+posX+","+posY+","+","+posZ+");");
+    public static int addNewPos(int posID, double posX, double posY, double posZ){//returns the ID of the position made
+       // int posID = getHighestID("position","posID")+1;
+        makeQuery("insert into position values ("+posID+","+posX+","+posY+","+posZ+");");
         return posID;
     }
-    public static int addNewVel(double velX, double velY, double velZ){//returns the ID of the position made
-        int velID = getHighestID("velocity","velID")+1;
-        makeQuery("insert into position values ("+velID+","+velX+","+velY+","+","+velZ+");");
+    public static int addNewVel(int velID, double velX, double velY, double velZ){//returns the ID of the position made
+     //   int velID = getHighestID("velocity","velID")+1;
+        makeQuery("insert into velocity values ("+velID+","+velX+","+velY+","+velZ+");");
         return velID;
     }
+
 
     public static void copySystemBodyLink(int bodyID, int sysID, int posID, int velID){
         //make the new IDs:
@@ -234,29 +256,29 @@ public class MariaDBConnector {
             System.out.println("problem at line 234 mariaDB connector copying a new system body link: "+e);
         }
 
-    }//for if there isn't a position yet
+    }//for if there isn't a position and velocity yet
 
-    private static Vector3D getPos(int posID) throws Exception{
+    public static Vector3D getPos(int posID) throws Exception{
         ResultSet posDets = makeQuery("select posX, posY, posZ from position where posID = "+posID+";");
         Vector3D result = new Vector3D(0,0,0);
         while (posDets.next()){
-            result.setComponent(0,posDets.getInt(1));
-            result.setComponent(1,posDets.getInt(2));
-            result.setComponent(2,posDets.getInt(3));
+            result.setComponent(0,posDets.getDouble(1));
+            result.setComponent(1,posDets.getDouble(2));
+            result.setComponent(2,posDets.getDouble(3));
         }
         return result;
     }
-    private static Vector3D getVel(int velID) throws Exception{
-        ResultSet velDets = makeQuery("select velX, velY, velZ from position where velID = "+velID+";");
+    public static Vector3D getVel(int velID) throws Exception{
+        ResultSet velDets = makeQuery("select velX, velY, velZ from velocity where velID = "+velID+";");
         Vector3D result = new Vector3D(0,0,0);
         while (velDets.next()){
-            result.setComponent(0,velDets.getInt(1));
-            result.setComponent(1,velDets.getInt(2));
-            result.setComponent(2,velDets.getInt(3));
+            result.setComponent(0,velDets.getDouble(1));
+            result.setComponent(1,velDets.getDouble(2));
+            result.setComponent(2,velDets.getDouble(3));
         }
         return result;
     }
-    private static Body getBody(int bodyID) throws Exception{
+    public static Body getBody(int bodyID) throws Exception{
         ResultSet bodyDets = makeQuery("select * from body where bodyID = "+bodyID+";");
         Body returnBody = new Body(0,0,0,0,0,0,"unnamed",0,0,false);
         while (bodyDets.next()){
@@ -264,8 +286,8 @@ public class MariaDBConnector {
             String type = bodyDets.getString(6);
             String name = bodyDets.getString(2);
             //int id = bodyDets.getInt(1);
-            double mass = bodyDets.getInt(3);
-            double radius = bodyDets.getInt(4);
+            double mass = bodyDets.getDouble(3);
+            double radius = bodyDets.getDouble(4);
 
             if(type == "star"){
                 double illumination = bodyDets.getInt(5);
@@ -584,5 +606,37 @@ public class MariaDBConnector {
         makeQuery("alter table position auto_increment = "+getHighestID("position","posID")+1+";");
         //now remove the rest of the bodies that aren't needed
         removeUnusedBodies();
+    }
+
+    public static void updateVelocity(int velID, double velX, double velY, double velZ) throws Exception{
+        makeQuery("update velocity set velX = "+velX+", velY = "+velY+", velZ = "+velZ+" where velID = "+velID+";");
+    }
+    public static void updatePosition(int posID, double posX, double posY, double posZ) throws Exception{
+        makeQuery("update position set posX = "+posX+", posY = "+posY+", posZ = "+posZ+" where posID = "+posID+";");
+    }
+
+    public static void updateAllPosAndVel(int bodyID, double posX, double posY, double posZ,double velX, double velY, double velZ) throws  Exception{
+        makeQuery("update position,velocity, linker set velX = "+velX+", velY = "+velY+", " +
+                "velZ = "+velZ+", posX = "+posX+", posY = "+posY+", posZ = "+posZ+" where linker.posID = position.posID" +
+                " and linker.velID = velocity.velID and linker.bodyID = "+bodyID+"; ");
+    }
+
+    public static void updateBody(int bodyID, double mass, double radius, double illumination, String name, String type){
+        makeQuery("update body set mass = "+mass+", radius = "+radius+", illumination = "+illumination+", name = \""+name+"\", " +
+                "type = \""+type+"\" where bodyID = "+bodyID+";");
+    }
+
+    public static void editInstanceOfBody(int posID, int velID, int bodyID, int systemID, double mass,
+                                          double radius, double illumination, String name, String type)
+    {
+        int newBodyID = getHighestID("body","bodyID") + 1;
+        //make a new body with these settings
+        makeQuery("insert into body values ("+newBodyID+",\""+name+"\","+mass+","+radius+","+illumination+",\""+type+"\");");
+        //delete the linker which linked the old body to the system
+        makeQuery("delete from linker where bodyID = "+bodyID+" and systemID = "+systemID+" and posID = "+posID+" and velID = "+ velID +";");
+        //add a new linker which links the new body to the system with the same velocity and position
+        makeQuery("insert into linker values ("+newBodyID+","+systemID+","+posID+","+velID+");");
+        //update the SelectedBody field in CreatorDataStorage
+        CreatorDataStorage.setBodyID(newBodyID);
     }
 }

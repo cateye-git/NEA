@@ -37,6 +37,9 @@ public class CreatorEditorController implements Initializable, CRUDInterface {
 
                 DataStore selectedItem = SelectBody.getSelectionModel().getSelectedItem();
                 idsOfSelectedItem = selectedItem.getIds();
+                CreatorDataStorage.setBodyID(idsOfSelectedItem[0]);
+                CreatorDataStorage.setPosID(idsOfSelectedItem[1]);
+                CreatorDataStorage.setVelID(idsOfSelectedItem[2]);
             }
         });
 
@@ -114,7 +117,15 @@ public class CreatorEditorController implements Initializable, CRUDInterface {
     }
     @FXML
     public void editSelected(ActionEvent e){
-
+//check that we have selected something:
+        if(checkCurrentlySelectedNeg() == false){
+            //then send the user to the Body Editor
+            try {
+                FXMLLoader.changeInExistingWindow(e,"EditBody.fxml");
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
     }
     @FXML
     public void addNew(ActionEvent e){

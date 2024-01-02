@@ -15,9 +15,9 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class InterloperSpecifyController{
-    private Stage stage;
-    private Scene scene;
-    private Parent root;
+  //  private Stage stage;
+   // private Scene scene;
+   // private Parent root;
 
     @FXML
     private TextField posX;

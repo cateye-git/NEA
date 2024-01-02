@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="650.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.nea.EditBodyController">
+<Button layoutX="636.0" layoutY="546.0" onAction="#allBodiesClickBody" prefHeight="90" prefWidth="350.0" text="Change for all instances" textFill="WHITE" textOverrun="WORD_ELLIPSIS">
+<font>
+    <Font size="24.0" />
+</font></Button>
+<Label layoutX="249.0" layoutY="27.0" prefHeight="70.0" prefWidth="502.0" text="Change Body Parameters">
+<font>
+    <Font size="40.0" />
+</font>
+</Label>
+<TextField fx:id="posX" layoutX="168.0" layoutY="157.0" prefHeight="27.0" prefWidth="73.0" text="0" />
+<TextField fx:id="posY" layoutX="255.0" layoutY="157.0" prefHeight="27.0" prefWidth="73.0" text="0" />
+<TextField fx:id="posZ" layoutX="340.0" layoutY="157.0" prefHeight="27.0" prefWidth="73.0" text="0" />
+<TextField fx:id="velZ" layoutX="340.0" layoutY="200.0" prefHeight="27.0" prefWidth="73.0" text="0" />
+<TextField fx:id="velY" layoutX="255.0" layoutY="200.0" prefHeight="27.0" prefWidth="73.0" text="0" />
+<TextField fx:id="velX" layoutX="168.0" layoutY="200.0" prefHeight="27.0" prefWidth="73.0" text="0" />
+<Label layoutX="23.0" layoutY="156.0" text="Position (x,y,z)" textFill="#c0c0c0">
+<font>
+    <Font size="20.0" />
+</font>
+</Label>
+<Label layoutX="23.0" layoutY="199.0" text="Velocity (x,y,z)" textFill="#c0c0c0">
+<font>
+    <Font size="20.0" />
+</font>
+</Label>
+<Label layoutX="627.0" layoutY="156.0" text="Mass" textFill="#c0c0c0">
+<font>
+    <Font size="20.0" />
+</font>
+</Label>
+<TextField fx:id="mass" layoutX="701.0" layoutY="157.0" prefHeight="27.0" prefWidth="73.0" text="1e18" />
+<Label layoutX="620.0" layoutY="186.0" text="Radius" textFill="#c0c0c0">
+<font>
+    <Font size="20.0" />
+</font>
+</Label>
+<TextField fx:id="radius" layoutX="701.0" layoutY="187.0" prefHeight="27.0" prefWidth="73.0" text="2e4" />
+<Label layoutX="623.0" layoutY="216.0" text="Name" textFill="#c0c0c0">
+<font>
+    <Font size="20.0" />
+</font>
+</Label>
+<TextField fx:id="name" layoutX="701.0" layoutY="217.0" prefHeight="27.0" prefWidth="73.0" text="Unnamed" />
+<Label layoutX="519.0" layoutY="246.0" prefHeight="30.0" prefWidth="168.0" text="Illumination if star" textFill="#c0c0c0">
+<font>
+    <Font size="20.0" />
+</font>
+</Label>
+<TextField fx:id="illumination" layoutX="701.0" layoutY="247.0" prefHeight="27.0" prefWidth="73.0" text="0" />
+<ChoiceBox fx:id="type" layoutX="687.0" layoutY="283.0" prefWidth="150.0" />
+<Label layoutX="628.0" layoutY="282.0" text="Type" textFill="#c0c0c0">
+<font>
+    <Font size="20.0" />
+</font>
+</Label>
+   <Button layoutX="636.0" layoutY="445.0" onAction="#justThisBodyClickBody" prefHeight="90" prefWidth="350.0" text="Change for just this body" textFill="WHITE" textOverrun="WORD_ELLIPSIS">
+      <font>
+         <Font size="24.0" />
+      </font>
+   </Button>
+   <Line endX="-1.0" endY="313.0" layoutX="500.0" layoutY="229.0" startX="-1.0" startY="-104.33333587646484" />
+   <Button layoutX="14.0" layoutY="445.0" onAction="#justThisBodyClickPosVel" prefHeight="90" prefWidth="350.0" text="Change for just this body" textFill="WHITE" textOverrun="WORD_ELLIPSIS">
+      <font>
+         <Font size="24.0" />
+      </font>
+   </Button>
+   <Button layoutX="14.0" layoutY="546.0" onAction="#allBodiesClickPosVel" prefHeight="90" prefWidth="350.0" text="Change for all instances" textFill="WHITE" textOverrun="WORD_ELLIPSIS">
+      <font>
+         <Font size="24.0" />
+      </font>
+   </Button>
+   <Button layoutX="430.0" layoutY="546.0" onAction="#goBackToEditor" prefHeight="90" prefWidth="135.0" text="Done" textFill="WHITE" textOverrun="WORD_ELLIPSIS">
+      <font>
+         <Font size="24.0" />
+      </font>
+   </Button>
+</AnchorPane>

@@ -9,6 +9,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -79,6 +80,12 @@ public class AddExistingBodyController implements Initializable {
     @FXML
     public void addNew(ActionEvent e){
         //so we need to send them to the AddNewBody
+        try {
+            FXMLLoader.changeInExistingWindow(e, "AddNewBody.fxml");
+        }
+        catch (IOException ex){
+            throw new RuntimeException(ex);
+        }
     }
 
     public void gettingSystem(){
