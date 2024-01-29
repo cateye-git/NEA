@@ -22,14 +22,12 @@ public class EditBodyController implements Initializable {
     private TextField posY;
     @FXML
     private TextField posZ;
-
     @FXML
     private TextField velX;
     @FXML
     private TextField velY;
     @FXML
     private TextField velZ;
-
     @FXML
     private TextField mass;
     @FXML
@@ -52,11 +50,8 @@ public class EditBodyController implements Initializable {
         type.getItems().addAll(types);
         //get the existing position and velocity and body details, and set the values of the fields to that
         try {
-            System.out.println("line 53 EditBodyController getting body details: ");
             Body bodyDets = MariaDBConnector.getBody(CreatorDataStorage.getBodyID());
-            System.out.println("line 53 EditBodyController getting pos details: ");
             Vector3D pos = MariaDBConnector.getPos(CreatorDataStorage.getPosID());
-            System.out.println("line 53 EditBodyController getting vel details: ");
             Vector3D vel = MariaDBConnector.getVel(CreatorDataStorage.getVelID());
 
             posX.setText(String.valueOf(pos.getComponent(0)));
@@ -71,7 +66,7 @@ public class EditBodyController implements Initializable {
             radius.setText(String.valueOf(bodyDets.getRadius()));
             if(bodyDets instanceof Star){
                 illumination.setText(String.valueOf(((Star) bodyDets).getIllumination()));
-                type.getSelectionModel().select(types[2]);//I dont want to have to do this, but using a String may get it confused
+                type.getSelectionModel().select(types[2]);//I dont want to have to do this, but its safest
                 //as it may return that the string doesnt exist in the list
             }
             else if (bodyDets instanceof Planet){
@@ -82,7 +77,7 @@ public class EditBodyController implements Initializable {
             }
             name.setText(bodyDets.getName());
         }catch (Exception e){
-            throw new RuntimeException("error at ln 80 EditBodyController: "+e);
+            throw new RuntimeException("error at EditBodyController: "+e);
         }
     }
 
@@ -99,7 +94,7 @@ public class EditBodyController implements Initializable {
                         CreatorDataStorage.getSystemID(),Double.valueOf(mass.getText()), Double.valueOf(radius.getText()),
                         Double.valueOf(illumination.getText()), name.getText(), type.getValue());
             }catch (Exception ex){
-                System.out.println("unchecked input ln 98 EditBodyController: "+ex);
+                //the user has entered an incrorect value, so don't do anything
             }
         }
     }
@@ -112,7 +107,7 @@ public class EditBodyController implements Initializable {
                     Double.valueOf(illumination.getText()), name.getText(), type.getValue());
         }
         catch (Exception ex){
-            System.out.println("unchecked input ln 106 EditBodyController: "+ex);
+            //the user has entered an incorrect value, so don't do anything
         }
     }
     @FXML
@@ -125,7 +120,7 @@ public class EditBodyController implements Initializable {
             MariaDBConnector.updateVelocity(CreatorDataStorage.getVelID(), Double.valueOf(velX.getText()),Double.valueOf(velY.getText()),
                     Double.valueOf(velZ.getText()));
         } catch (Exception ex) {
-            System.out.println("some unchecked input w user, line 109 EditBodyController: "+ex);
+            //the user has entered an incorrect value, so don't do anything
         }
     }
     @FXML
@@ -136,18 +131,15 @@ public class EditBodyController implements Initializable {
             MariaDBConnector.updateAllPosAndVel(CreatorDataStorage.getBodyID(), Double.valueOf(posX.getText()),Double.valueOf(posY.getText()),
                     Double.valueOf(posZ.getText()),Double.valueOf(velX.getText()),Double.valueOf(velY.getText()), Double.valueOf(velZ.getText()));
         } catch (Exception ex) {
-            System.out.println("some unchecked input w user, line 123 EditBodyController: "+ex);
+            //the user has entered an incorrect value, so don't do anything
         }
     }
 
     private boolean checkIfAnythingChanged(){
         boolean changed = false;
         try {
-            System.out.println("line 53 EditBodyController getting body details: ");
             Body bodyDets = MariaDBConnector.getBody(CreatorDataStorage.getBodyID());
-            System.out.println("line 53 EditBodyController getting pos details: ");
             Vector3D pos = MariaDBConnector.getPos(CreatorDataStorage.getPosID());
-            System.out.println("line 53 EditBodyController getting vel details: ");
             Vector3D vel = MariaDBConnector.getVel(CreatorDataStorage.getVelID());
 
             if(Double.valueOf(posX.getText()) != pos.getComponent(0) ||Double.valueOf(posY.getText()) != pos.getComponent(1)

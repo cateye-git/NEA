@@ -66,7 +66,7 @@ public class AddNewBodyController implements Initializable {
             FXMLLoader.changeInExistingWindow(event, "CreatorEditor.fxml");
         }
         catch (Exception ex){
-            System.out.println("error line 67 AddNewBody (probably an illegitimate input): "+ex);
+            //illegitimate input
         }
     }
 }

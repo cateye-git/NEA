@@ -7,7 +7,7 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class Simulator {        //will not let me set it to static???
+public class Simulator {        //this should be static class, alas java has other plans and will not let me
     // this is the class which will:
 
     // take in which system to add
@@ -37,6 +37,8 @@ public class Simulator {        //will not let me set it to static???
 
     private static int sysID;
 
+    private static final double G = 6.674e-11;// gravitational constant needed to calculate accurate positions
+
     public static double getInterloperSignificance() {
         return interloperSignificance;
     }
@@ -59,7 +61,7 @@ public class Simulator {        //will not let me set it to static???
 
     private static FileOperations fileOps;
 
-    static double proposedNewMass = 0;
+    private static double proposedNewMass = 0;
 
     public static void setFileOps(FileOperations fileOperations){
         fileOps = fileOperations;
@@ -115,25 +117,13 @@ public class Simulator {        //will not let me set it to static???
 
 
     public static ArrayList<Body> getSystemData(){
-        System.out.println("getting system data");
-
         //select all bodies from the required system, name is done in separate subroutine
-
-        //test data
         ArrayList<Body> bodies = new ArrayList<>();
-
-        /*
-        Body earth = new Body(0,9e8,7382000,0,0,0,"body1",6e24,6371000, true);
-        earth.setSimulationID(0);
-        bodies.add(earth);
-
-         */
-
         try{
             bodies = MariaDBConnector.getBodiesOfSystem(sysID);
         }
         catch (Exception e){
-            System.out.println("problem with fetching bodies at simulator level: "+e);
+            throw new RuntimeException("problem with fetching bodies at simulator level: "+e);
         }
         return bodies;
     }
@@ -157,10 +147,8 @@ public class Simulator {        //will not let me set it to static???
     static private double significanceCuttoff = 1e5;
     static private double significanceMultiplier = 1e-5;
     public static void endSimulation(double time){
-        System.out.println("Simulator line 160 ending simulation");
         loader = new SimulatorControllerLoad(stage);
         fileOps.closeOutputFileHandle();
-        System.out.println("Simulator line 163 ending simulation still");
 
         //there are 3 possibilities in this scenario:
         // 1: the user just wants to leave
@@ -168,29 +156,21 @@ public class Simulator {        //will not let me set it to static???
         // 3: the user has run with the interloper and now wants a critical mass
 
         //in 2 and 3, we need to store data about the system that has just been run.
-
-        //revertBodiesToOriginal();
         if(interloperIsSelected == false){
             //then the user has finished altogether and just wants to leave.
             //so just boot up the main menu
-            System.out.println("finished");
             loader.load("MainMenuView.fxml","Main Menu");
         }
         else if(interloperInSimulation){
-            System.out.println("giving crit mass");
             //then the user wants an updated critical mass
             //first we need to calculate the significance
             interloperSignificance = findSignificance(); //this returns a number which corresponds to the significance;
-            System.out.println(interloperSignificance);
             //now we need to find a new mass of the interloper based on this significance
             proposedNewMass = interloper.getMass() / ((interloperSignificance/significanceCuttoff)*significanceMultiplier);
             //then we show it to the user:
-
             loader.load("SignificanceValue.fxml", "Controls");
-
         }
         else{
-            System.out.println("running again w interloper");
             //then the user has selected an interloper, and it hasn't been done yet, so we will play the simulation again with the interloper.
             //first we need the quitting time so that we know when to quit next time
             quittingTime = time;
@@ -202,9 +182,7 @@ public class Simulator {        //will not let me set it to static???
             //now reset the bodies to the original and add the interloper
             bodies = makeNewBodyList();
             bodies.add(interloper);
-
-            //loader = new SimulatorControllerLoad(stage);
-            loader.load("3DBodySimulator.fxml", "test");
+            loader.load("3DBodySimulator.fxml", "3D body");
 
             interloperInSimulation = true;
             stageOfRunning = "runningWithInterloper";
@@ -216,7 +194,6 @@ public class Simulator {        //will not let me set it to static???
 
 
     private static Body getRandomInterloper(ArrayList<Body> bodies){
-        System.out.println("making a random interloper from bodies of length "+bodies.size());
         //to be called when the user asks for a random interloper
         // position will be a random one between the furthest body and double that distance
         // mass will be, at first, the same as the averages of the bodies
@@ -264,13 +241,11 @@ public class Simulator {        //will not let me set it to static???
         // volume = (4/3)(pi)(r^3) therefore r = (v/(4pi/3))^1/3
         double interloperRadius = Math.pow(interloperVolume/4*3.14159265359/3,1/3);
 
-
         Body interloper = new Body(interloperPosition,interloperVelocity, "Interloper",interloperMass, interloperRadius, false);
         System.out.println("interloper made is "+interloper);
         return interloper;
     }
 
-    private static double G = 6.674e-11;// gravitational constant needed to calculate accurate positions
 
     private static Vector3D[] getAccelerationOfTwoBodies(Vector3D b1Pos, Vector3D b2Pos, double b1Mass, double b2Mass){
         double dist = Vector3D.getDistance(b1Pos, b2Pos);
@@ -345,20 +320,12 @@ public class Simulator {        //will not let me set it to static???
         if(accelerations.length == 1){
             accelerations[0] = new Vector3D(0,0,0);
         }
-
-        /*
-        for(Vector3D acc : accelerations){
-            System.out.println(acc);
-        }
-        accelerations are working correctly for bodies
-         */
         return accelerations;
     }
 
     private static void setHabitabilities(ArrayList<Body> bodies){
 
         //for each planet, look at all the stars and do an I/r^2 calculation to find the habitability
-        //this code is untested as of 25/10/2023
         for(Body body : bodies){
             if(body instanceof Planet){
                 double newHabitability = 0;
@@ -421,32 +388,6 @@ public class Simulator {        //will not let me set it to static???
         ks[3] = getAllAccelerations(Vector3DArrayOperations.addVectors(positions,Vector3DArrayOperations.multiplyVectors(kv[2],dt)),masses); // acc of(position + kv2 * dt)
         kv[3] = Vector3DArrayOperations.addVectors(kv[0],Vector3DArrayOperations.multiplyVectors(ks[2],dt)); // velocity + ks2 * dt
 
-
-        /*
-        //temp
-        System.out.println("RK4 steps: ");
-        System.out.println("");
-        System.out.println("ks:");
-        int test = 0;
-        for (Vector3D[] k: ks) {
-            System.out.println("ks "+test);
-            test++;
-            for(Vector3D k2 : k) {
-                System.out.println(k2);
-            }
-        }
-        System.out.println("");
-        System.out.println("kv:");
-        test = 0;
-        for (Vector3D[] k: kv ) {
-            System.out.println("kv "+test);
-            test++;
-            for(Vector3D k2 : k) {
-                System.out.println(k2);
-            }
-        }
-
-         */
         // use kv and ks to predict new position and velocity
 
         int counter = 0;
@@ -462,35 +403,15 @@ public class Simulator {        //will not let me set it to static???
         for(Body body : bodies){
             //get dt/6 * ks1+2ks2+2ks3+ks4
             sumOfDisplacementCoefficients[counter]= Vector3D.add(Vector3D.add(Vector3D.add(ks[0][counter], ks[1][counter]),ks[2][counter]),ks[3][counter]);
-            //System.out.println("showing sumOfDisplacementCoefficient:");
-            //System.out.println(counter + " " + sumOfDisplacementCoefficients[counter]);
-
             sumOfDisplacementCoefficients[counter] = Vector3D.multiply(sumOfDisplacementCoefficients[counter], dt/6);
-            //System.out.println("Now multiplied by dt/6: ");
-            //System.out.println(counter + " " + sumOfDisplacementCoefficients[counter]);
 
             //get dt/6 * kv1+2kv2+2kv3+kv4
             sumOfVelocityCoefficients[counter]= Vector3D.add(Vector3D.add(Vector3D.add(kv[0][counter], kv[1][counter]),kv[2][counter]),kv[3][counter]);
-            //System.out.println("showing sumOfVelocityCoefficient:");
-            //System.out.println(counter + " " + sumOfVelocityCoefficients[counter]);
-            //sumOfVelocityCoefficients[counter] = Vector3D.multiply(sumOfVelocityCoefficients[counter], dt/6);
             sumOfVelocityCoefficients[counter] = sumOfVelocityCoefficients[counter].multiply(dt/6);
-            //System.out.println("Now multiplied by dt/6: ");
-            //System.out.println(counter + " " + sumOfVelocityCoefficients[counter]);
 
-
-            // use these to set the new position and velocity of the bodies with
-            // s += dt/6 * (kv1 + 2kv2 + 2kv3 + kv4)
-            // v += dt/6 * (ks1 + 2ks2 + 2ks3 + ks4)
-
-            //System.out.println(sumOfVelocityCoefficients[0]);
-            //body.setVelocity(Vector3D.add(body.getVelocity(),sumOfDisplacementCoefficients[counter]));
             body.setVelocity(body.getVelocity().addVector(sumOfDisplacementCoefficients[counter]));
-            //body.setPosition(Vector3D.add(body.getPosition(),sumOfVelocityCoefficients[counter]));
             body.setPosition(body.getPosition().addVector(sumOfVelocityCoefficients[counter]));
             counter++;
-
-            //  System.out.println(body.getPosition());
         }
     }
 
@@ -499,11 +420,6 @@ public class Simulator {        //will not let me set it to static???
     private static double collisionCoefficient = 1e5;
     private static double habitabilityCoefficient = 2;
     private static double findSignificance(){
-
-        System.out.println("");
-        System.out.println("finding significance between lists:");
-        //System.out.println("first list length "+lastSnapNoInterloper.size());
-        //System.out.println("and second list length "+bodies.size());
         double significance = 0;
         //this subroutine is in charge of finding the significance of the interloper. First it needs some values
         //the first value is some average of how much the planets have moved.
@@ -563,17 +479,13 @@ public class Simulator {        //will not let me set it to static???
         double noCollisions = Math.abs(origSize - newSize); //this is the no of collisions
         double habitabilityChange = Math.abs(withInterloperHabitability - noInterloperHabitability);
 
-        System.out.println("centre of mass has changed by: " +COMChange);
-        System.out.println("av velocity had changed by: " +velChange);
-        System.out.println("no collisions: "+noCollisions);
-        System.out.println("habitability change: "+habitabilityChange);
-
-        significance += COMChange * COMcoefficient + velChange * velCoefficient + noCollisions + noCollisions * collisionCoefficient + habitabilityChange * habitabilityCoefficient;
+        significance += COMChange * COMcoefficient + velChange * velCoefficient + noCollisions +
+                noCollisions * collisionCoefficient + habitabilityChange * habitabilityCoefficient;
 
         return significance;
     }
 
-    private static void checkCollisions(double time){                                           //!!! TURN TO PRIVATE IF NOT
+    private static void checkCollisions(double time){
         // given that we can treat all bodies as spheres, the easiest way to check for any collisions is to look at
         // whether the distance between any two planets is less than the sum of their radii.
         // if so, a collision has occured
@@ -583,33 +495,26 @@ public class Simulator {        //will not let me set it to static???
         // they aren't colliding
 
      //   int currentBody = 0;//  start at the first body
-        for(int currentBody = 0;currentBody < bodies.size();currentBody++){ // for each body    //remember to talk about why did this with that odd error
+        for(int currentBody = 0;currentBody < bodies.size();currentBody++){ // for each body
             Body body = bodies.get(currentBody);
             for(int iterator = currentBody+1;iterator < bodies.size();iterator++){// from the next body to the end:
                 Body otherBody = bodies.get(iterator);
-                //  System.out.println("testing collision between "+body.getName() + " and "+otherBody.getName());
                 // get sum of radii
                 double sumOfRadii = body.getRadius() + otherBody.getRadius();
                 // get distance between them
-                //double dist = Vector3D.getDistance(body.getPosition(), otherBody.getPosition());
                 double dist = body.getPosition().getDistance(otherBody.getPosition());
 
                 if(dist <= sumOfRadii){
                     //then a collision has occured
                     // the result of the collision will depend on velocity and mass of the planet
-                    System.out.println("COLLISION between "+body.getName()+" and "+otherBody.getName());
+                   // System.out.println("COLLISION between "+body.getName()+" and "+otherBody.getName());
 
                     //Rnew = cube root(R1^3 + R2^3)
                     double newRadius = Math.pow((Math.pow(body.getRadius(),3) + Math.pow(otherBody.getRadius(),3)),0.333d);
-               //     System.out.println("r1 = "+body.getRadius()+" r2 = "+otherBody.getRadius()+" so rNew = "+newRadius);
                     //Mnew = m1 + m2
                     double newMass = body.getMass() + otherBody.getMass();
-                 //   System.out.println("m1 = "+body.getMass()+" m2 = "+otherBody.getMass()+" so mNew = "+newMass);
-
                     //get momentum of old bodies
-                   // Vector3D momentumCurrent = Vector3D.multiply(body.getVelocity(),body.getMass());
                     Vector3D momentumCurrent = body.getVelocity().multiply(body.getMass());
-                    //Vector3D momentumOther = Vector3D.multiply(otherBody.getVelocity(),otherBody.getMass());
                     Vector3D momentumOther = otherBody.getVelocity().multiply(otherBody.getMass());
 
                     //use this to find momentum of new body
@@ -630,7 +535,7 @@ public class Simulator {        //will not let me set it to static???
                     Body newBody = null;
                     if(body instanceof Star || otherBody instanceof Star) {
                         double newLuminosity = 0;
-                        if (body instanceof Star) {
+                        if (body instanceof Star) {//   for a more accurate model I could add the loss in kinetic energy, but this is only a qualatitave measure
                             newLuminosity += ((Star) body).getIllumination();
                         }
                         if (otherBody instanceof Star) {
@@ -646,16 +551,9 @@ public class Simulator {        //will not let me set it to static???
                         newBody = new Body(newPos, Vnew, "collision between "+body.getName()+" and "+otherBody.getName(), newMass, newRadius, true);
                     }
 
-
-                   // newBody.setSimulationID(getNewSimID());
-
-               //     System.out.println(newRadius + " " + newBody);
                     bodies.remove(iterator);
-               //     System.out.println("removed"+otherBody);
                     bodies.remove(currentBody);
-                //    System.out.println("removed "+body);
                     bodies.add(newBody);
-                //    System.out.println("added "+newBody);
 
                     fileOps.writeCollision(time, body, otherBody);
 

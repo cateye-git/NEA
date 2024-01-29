@@ -2,15 +2,18 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
 <AnchorPane prefHeight="400.0" prefWidth="626.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.nea.SignificanceValueController">
     <children>
-        <Label layoutX="157.0" layoutY="24.0" prefHeight="62.0" prefWidth="312.0" text="Significance value for interloper" textFill="WHITE">
-        </Label>
+        <Label layoutX="157.0" layoutY="24.0" prefHeight="62.0" prefWidth="312.0" text="Significance value for interloper">
+         <font>
+            <Font size="18.0" />
+         </font></Label>
       <Label layoutX="25.0" layoutY="112.0" text="Old mass:" />
       <Label layoutX="25.0" layoutY="149.0" text="Significance:" />
-      <Button fx:id="resimulateButton" layoutX="394.0" layoutY="187.0" mnemonicParsing="false" prefHeight="72.0" prefWidth="169.0" text="Resimulate with new mass" onAction="#resimulatePressed" />
-      <Button fx:id="exitButton" layoutX="395.0" layoutY="283.0" mnemonicParsing="false" prefHeight="72.0" prefWidth="169.0" text="exit" onAction="#exitPressed" />
+      <Button fx:id="resimulateButton" layoutX="394.0" layoutY="187.0" mnemonicParsing="false" onAction="#resimulatePressed" prefHeight="72.0" prefWidth="169.0" text="Resimulate with new mass" />
+      <Button fx:id="exitButton" layoutX="395.0" layoutY="283.0" mnemonicParsing="false" onAction="#exitPressed" prefHeight="72.0" prefWidth="169.0" text="exit" />
       <Label layoutX="25.0" layoutY="191.0" text="new suggested mass:" />
         <Label layoutX="25.0" layoutY="250.0" text="interloper start pos:" />
         <TextField fx:id="interloperStartPosField" editable="false" layoutX="164.0" layoutY="245.0" prefHeight="27.0" prefWidth="200.0" />

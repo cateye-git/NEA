@@ -38,18 +38,6 @@ public class SignificanceValueController implements Initializable {
     @FXML
     private TextField interloperStartPosField;
 
-
-    /*
-    public void showValues(double oldMass, double sigVal, double newMass){
-        oldMassField.setText(String.valueOf(oldMass));
-        sigValueField.setText(String.valueOf(sigVal));
-        newMassField.setText(String.valueOf(newMass));
-    }
-
-     */
-
-
-
     public void resimulatePressed(ActionEvent event) throws IOException{
         //update interloper
         Simulator.updateInterloperMass();
@@ -57,15 +45,6 @@ public class SignificanceValueController implements Initializable {
         Simulator.restart();
 
         com.example.nea.FXMLLoader.changeInExistingWindow(event,"3DBodySimulator.fxml");
-        /*
-        root = FXMLLoader.load(getClass().getResource("3DBodySimulator.fxml"));
-        stage = (Stage)((Node)event.getSource()).getScene().getWindow();
-        scene = new Scene(root);
-        scene.getStylesheets().add(getClass().getResource("/menus.css").toExternalForm());
-        stage.setScene(scene);
-        stage.show();
-
-         */
     }
 
     public void exitPressed(){
@@ -85,35 +64,6 @@ public class SignificanceValueController implements Initializable {
         interloperStartPosField.setText(posString);
     }
 
-    /*
-    private String returnsf(double num, int sf){
-        String strNum = String.valueOf(num);
-        int exponent = 0;
-
-        String ref = "";
-        if(num >= 10) {
-            //find the order
-            while(num >= 10){
-                num /= 10;
-                exponent++;
-            }
-        }
-        else{
-            while(num < 1){
-                num *= 10;
-                exponent--;
-            }
-        }
-        for(int counter = 1; counter < sf;counter++){
-            ref += strNum.toCharArray()[counter-1];
-            if(counter == 1){
-                ref += ".";
-            }
-        }
-        ref += "e"+exponent;
-        return ref;
-    }
-     */
     private static String returnsf(double num, int sf, int exponent){
         if(Math.abs(num) >= 10){
             String ans = returnsf(num/10, sf, exponent+1);

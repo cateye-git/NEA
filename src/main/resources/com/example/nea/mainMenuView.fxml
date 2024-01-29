@@ -9,7 +9,7 @@
         <font>
             <Font size="24.0" />
         </font></Button>
-    <Button layoutX="14.0" layoutY="240.0" onAction="#onEditorButtonClick" prefHeight="90" prefWidth="350.0" text="Creator" textFill="WHITE" textOverrun="WORD_ELLIPSIS">
+    <Button layoutX="14.0" layoutY="240.0" onAction="#onEditorButtonClick" prefHeight="90" prefWidth="350.0" text="Create" textFill="WHITE" textOverrun="WORD_ELLIPSIS">
         <font>
             <Font size="24.0" />
         </font></Button>
@@ -17,7 +17,7 @@
         <font>
             <Font size="24.0" />
         </font></Button>
-    <Label layoutX="274.0" layoutY="26.0" prefHeight="70.0" prefWidth="452.0" text="Celestial Body Simulate">
+    <Label layoutX="274.0" layoutY="26.0" prefHeight="70.0" prefWidth="452.0" text="Celestial Body Simulator">
         <font>
             <Font size="40.0" />
         </font>

@@ -56,7 +56,7 @@ public class Vector3D {
         String ref = "vector "+ name+ " ("+getComponent(0)+", "
                 +getComponent(1)+ ", "+ getComponent(2)+")";
         return ref;
-    }   //  return the name and all the components when the item is printed
+    }   //  return the name and all the components when the item is printed (for debug purposes mainly)
 
     public String returnComponentsAsString(){
         return "("+components[0] + ", "+components[1]+", "+components[2]+")";
@@ -140,7 +140,7 @@ public class Vector3D {
             //so just skip over everything and return 0
             int counter = 0;
             for (double component : getAllComponents()) { // loop through each component of the old vector
-                unitVector.setComponent(counter, component / mag); // set that component of the new vector to be the
+                unitVector.setComponent(counter, component / mag); // set that component of the new vector
                 counter++; // old one divided by the magnitude
             }
         }
@@ -212,7 +212,6 @@ public class Vector3D {
         catch (NullPointerException e){
             returnVector.setName("Unnamed");
         }
-
         //try setting components, any null components will be set to 0
         try {
             vectToConvert.getAllComponents();
@@ -227,8 +226,6 @@ public class Vector3D {
         catch (NullPointerException e){
             returnVector.setAllComponents(0,0,0);
         }
-
-
         return returnVector;
     }
 
@@ -250,7 +247,8 @@ public class Vector3D {
         Vector3D returnVector = new Vector3D(0,0,0);
         int counter = 0;
         for(double component : to.getAllComponents()){
-            returnVector.setComponent(0, (component - getComponent(counter)*-1));
+            returnVector.setComponent(counter, (component - getComponent(counter)*-1));
+            counter++;
         }
         return  returnVector.getUnitVector();
     }

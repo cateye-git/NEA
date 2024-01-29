@@ -10,14 +10,11 @@ public class FileOperations {
     // this is a class which will be instantiated by the PlanetSystem class at runtime to handle outputting to CSV files
 
     public void openOutputFileHandle(String fileName){
-        System.out.println("opening "+fileName);
         if(fileName.contains(".")){
             //  cannot contain . because that could lead to errors where the filename has ended
-            throw new RuntimeException("filename cannot contain '.'");
         }
         else if(writer != null){
             // cannot open a file handle if one already exists
-            throw new RuntimeException("file handle already exists");
         }
         else{
             try{// has to be in a try catch statement for Java to allow it
@@ -32,7 +29,7 @@ public class FileOperations {
     public void closeOutputFileHandle(){
         System.out.println("closing file ");
         if(writer == null){
-            throw new RuntimeException("file handle doesnt exist");// have to open one first
+            //throw new RuntimeException("file handle doesnt exist");// have to open one first
         }
         else{
             try {
@@ -70,7 +67,7 @@ public class FileOperations {
 
     public void writeCollision(double t, Body b1, Body b2){
         String[] data = new String[3];
-        data[0] = "COLLISION.."+String.valueOf(t);// starts with the time of the snapshot        //Double full stop
+        data[0] = "COLLISION.."+ t;// starts with the time of the snapshot        //Double full stop
         data[1] = b1.convertToCSVEntry();// each body has a method which converts its values to CSV
         data[2] = b2.convertToCSVEntry();
 

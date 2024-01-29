@@ -15,11 +15,7 @@ public class main extends Application {
 
         FXMLLoader fxmlLoader = new FXMLLoader(main.class.getResource("mainMenuView.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
-
-        //String css = getClass().getResource("menus.css").toExternalForm();
-        //scene.getStylesheets().add(css);
         scene.getStylesheets().add(getClass().getResource("/menus.css").toExternalForm());
-        //repeat for all scenes
 
         stage.setTitle("Celestial Body Simulator");
         stage.setScene(scene);

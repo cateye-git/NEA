@@ -79,9 +79,6 @@ public class Simulator3DClass {
                 followBody = body;
             }
         }
-        //Vector3D rotAxis = Vector3D.getDirection(followBody.getPosition(),new Vector3D(cam.getTranslateX(), cam.getTranslateY(), cam.getTranslateZ()));
-       // cam.setRotationAxis(new Point3D(rotAxis.getComponent(0),rotAxis.getComponent(1),rotAxis.getComponent(2)));
-       // cam.setRotate(0);
 
         following = true;
         //reset all translations
@@ -113,9 +110,7 @@ public class Simulator3DClass {
             spheres.add(sphere);
         }
 
-        //TEMP
         followBody = bodies.get(0);
-        //Sphere sphere = new Sphere(200);                        //      generating a sphere
 
         Scene scene = new Scene(group,screenWidth,screenHeight, true);    //  making the scene object so that we can actually make a new window
 
@@ -146,35 +141,28 @@ public class Simulator3DClass {
                 }
                 );
 
-        primaryStage.addEventHandler(KeyEvent.KEY_PRESSED, keyEvent -> {        //      handling the inputs to allow our user to move the camera
+        primaryStage.addEventHandler(KeyEvent.KEY_PRESSED, keyEvent -> {        //      handling the inputs to allow the user to move the camera
             switch (keyEvent.getCode()) {
                 case W:
                    camLocalZpos += camSpeed;
-                //   translateCam();
                     break;
                 case S:
                     camLocalZpos -= camSpeed;
-                //    translateCam();
                     break;
-
                 case A:
                    camLocalXpos -= camSpeed;
-                //    translateCam();
                     break;
                 case D:
                    camLocalXpos += camSpeed;
-                 //   translateCam();
                     break;
                 case Q:
                    camLocalYpos -= camSpeed;
-                 //   translateCam();
                     break;
                 case E:
                     camLocalYpos += camSpeed;
                     break;
                 case M:
                     dtMultiplier *= 1.1f;
-                    //   translateCam();
                     break;
                 case N:
                     dtMultiplier *= 0.9f;
@@ -187,62 +175,26 @@ public class Simulator3DClass {
             public void handle(long timeStamp) {
 
                 double nanoTime = Duration.between(lastTime, LocalDateTime.now()).getNano(); //gets the nanoseconds part of the time between now and last time
-                /*
-                if(nanoTime < 0){
-                    deltaTime += 1e9; //so if it goes from say 0.9 secs to 0.1, the dt will be
-                    //          0.1-0.9 = -0.8
-                    //          so we add 1 to it to get 0.2 which is the true time elapsed
-                    //          that is unless more than a second has passed, in which case the simulation is running
-                    //          too slowly anyway, so is not a valuable thing to consider
-                }
-
-                 */
 
                 lastTime = LocalDateTime.now();
                 nanoTime *= dtMultiplier / 1e9;
-                //nanoTime *= dtMultiplier;
                 timeElapsed += nanoTime;
 
-                //timeElapsed += 60; //TEMP
                 if(timeElapsed >= Simulator.getQuitTime() && Simulator.getStageOfRunning() == "runningWithInterloper"){
                     stopAll();
                 }
                 timeElapsedSinceLastFileWrite += nanoTime;
-                //timeElapsedSinceLastFileWrite += 60; //temp
 
-                //TEMP!!!
-                //Simulator.updateBodies(60,timeElapsed);
                 Simulator.updateBodies(nanoTime, timeElapsed);
 
                 if(timeElapsedSinceLastFileWrite >= fileWriteInterval){
-                    //System.out.println("printing to file now!");
                     while(timeElapsedSinceLastFileWrite >= fileWriteInterval) {
                         timeElapsedSinceLastFileWrite -= fileWriteInterval;
                     }
                     Simulator.writeSnapshot(timeElapsed);
                 }
-              //  System.out.println(timeElapsed);
 
-               // System.out.println(deltaTime);
-
-
-
-                // now we need to update the spheres
-
-                //in case any bodies have been removed (collisions):
-                /*
-                while(bodies.size() < spheres.size()){
-                    //a collision has occured
-                    System.out.println("bodies is size "+bodies.size()+" removing 1 from spheres as it is size "+spheres.size());
-                    spheres.remove(spheres.size()-1);
-                  //  spheres.add(new Sphere(1));
-                 //   group.getChildren().add(spheres.get(spheres.size()-1));
-                    group.getChildren().remove(spheres.size()-1);
-                }
-
-
-                 */
-                //if there's a discrepancy, remove all and then add new
+                //if there's a discrepancy between no bodies and no spheres, remove all and then add new
                 //this is inefficient but because of the way I have set it up, it is very hard to effectively
                 //find the correct Sphere to remove
                 if(bodies.size() != spheres.size()){
@@ -252,7 +204,6 @@ public class Simulator3DClass {
                     }
                     int counter = 0;
                     for(Body body: bodies){
-                      //  System.out.println("ADD sphere to get to "+bodies.size()+ " from " + spheres.size());
                         spheres.add(new Sphere(body.getRadius()));
                         group.getChildren().add(spheres.get(counter));
                         counter++;
@@ -262,28 +213,21 @@ public class Simulator3DClass {
                 int counter =0;
                 try{
                 for(Body body : bodies){
-                //    System.out.println(body.getName()+ " " + body.getPosition());
                     Vector3D bodyPos = body.getPosition();
                     Sphere sphere = spheres.get(counter);
-                   // System.out.println(bodyPos);
+
                     sphere.setRadius(body.getRadius()*everythingMultiplier);
                     sphere.setTranslateX(bodyPos.getComponent(0)*everythingMultiplier);
                     sphere.setTranslateY(bodyPos.getComponent(1)*-everythingMultiplier);
                     sphere.setTranslateZ(bodyPos.getComponent(2)*everythingMultiplier);
                     counter++;
                 }
-       //             System.out.println(" ");
-                //    System.out.println(" ");
             }catch (Exception e){
                     System.out.println(bodies.size() + " " + spheres.size());
                     throw new RuntimeException("dicrepency when configuring spheres: " + e);
                 }
 
                 translateCam();
-
-
-               // System.out.println("velocity = " + bodies.get(0).getVelocity());
-               // System.out.println("position = " + bodies.get(0).getPosition());
             }
         };
         timer.start();
