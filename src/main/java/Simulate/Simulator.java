@@ -35,6 +35,10 @@ public class Simulator {        //this should be static class, alas java has oth
 
     private static ArrayList<Body> bodies;
 
+   // public static void setBodies(ArrayList<Body> newBodies){//remove after testing
+   //     bodies = newBodies;
+   // }
+
     private static int sysID;
 
     private static final double G = 6.674e-11;// gravitational constant needed to calculate accurate positions
@@ -110,6 +114,7 @@ public class Simulator {        //this should be static class, alas java has oth
     }
 
     public static void updateBodies(double dt, double time){
+        System.out.println("interloper is "+interloper + " w radius "+ interloper.getRadius());
         RK4(dt);
         checkCollisions(time);
         setHabitabilities(bodies);
@@ -166,7 +171,16 @@ public class Simulator {        //this should be static class, alas java has oth
             //first we need to calculate the significance
             interloperSignificance = findSignificance(); //this returns a number which corresponds to the significance;
             //now we need to find a new mass of the interloper based on this significance
-            proposedNewMass = interloper.getMass() / ((interloperSignificance/significanceCuttoff)*significanceMultiplier);
+           // proposedNewMass = interloper.getMass() / ((interloperSignificance/significanceCuttoff)*significanceMultiplier); LEGACY
+            if(interloperSignificance == 0){
+                interloperSignificance = 0.01; // to avoid NaN
+            }
+            if(interloperSignificance < 0){
+                interloperSignificance = -interloperSignificance;
+            }
+            double significanceEffect = interloperSignificance / significanceCuttoff;
+            significanceEffect = Math.pow(significanceEffect, significanceMultiplier);
+            proposedNewMass = interloper.getMass()/significanceEffect;
             //then we show it to the user:
             loader.load("SignificanceValue.fxml", "Controls");
         }
@@ -191,7 +205,6 @@ public class Simulator {        //this should be static class, alas java has oth
         }
 
     }
-
 
     private static Body getRandomInterloper(ArrayList<Body> bodies){
         //to be called when the user asks for a random interloper
@@ -229,7 +242,7 @@ public class Simulator {        //this should be static class, alas java has oth
         //the position = the unit vector * (random between furthest out and double that)
         double distAway = largestPos * (1 + random.nextFloat());
         Vector3D interloperPosition = Vector3D.multiply(unitRandom, distAway);
-        Vector3D interloperVelocity = interloperPosition.multiply(-0.01f);
+        Vector3D interloperVelocity = interloperPosition.multiply(-0.0001f);
 
         //to get the correct radius, we will need the density and the mass of the interloper
         //this will allow us to find the volume, which we can use to find the radius
@@ -239,10 +252,21 @@ public class Simulator {        //this should be static class, alas java has oth
         // density = mass/volume so therefore volume = mass/density
         double interloperVolume = interloperMass / density;
         // volume = (4/3)(pi)(r^3) therefore r = (v/(4pi/3))^1/3
-        double interloperRadius = Math.pow(interloperVolume/4*3.14159265359/3,1/3);
+        double interloperRadius = Math.pow(interloperVolume/(4*3.14159265359/3),0.333f);
+        interloperPosition.setName("pos");
+        interloperVelocity.setName("vel");
+
+        if(Double.isNaN(interloperRadius)){
+            interloperRadius = 0;
+        }
+        if(Double.isNaN(interloperMass)){
+            interloperMass = 0;
+        }
+
+
 
         Body interloper = new Body(interloperPosition,interloperVelocity, "Interloper",interloperMass, interloperRadius, false);
-        System.out.println("interloper made is "+interloper);
+        //System.out.println("interloper made is "+interloper);
         return interloper;
     }
 
@@ -276,7 +300,7 @@ public class Simulator {        //this should be static class, alas java has oth
         return accs;
     }// gets the acceleration on two bodies based on their position and masses
 
-    private static Vector3D[] getAllAccelerations(Vector3D[] positions, Double[] masses){
+    private static Vector3D[] getAllAccelerations(Vector3D[] positions, double[] masses){
         // the addAccelerationOnOf subroutine takes in two bodies, body 1 and 2, and adds the acceleration
         // of two input bodies due to the force on each other.
         // Therefore, if I input bodies 1 and 2, I do not need to input bodies 2 and 1 as this would be doubling up
@@ -316,9 +340,12 @@ public class Simulator {        //this should be static class, alas java has oth
             //have now done all accelerations for that body
             currentBody++;
         }
+        for(Vector3D acc : accelerations){
+            acc.setName("acc");
+        }
 
         if(accelerations.length == 1){
-            accelerations[0] = new Vector3D(0,0,0);
+            accelerations[0] = new Vector3D(0,0,0, "acc");
         }
         return accelerations;
     }
@@ -341,84 +368,113 @@ public class Simulator {        //this should be static class, alas java has oth
         }
     }
 
-    private static void RK4(double dt){
-        int numBodies = bodies.size();
-
-        // it is calculated as so:
-        // for each planet:
-        // ks1 = acceleration
-        // kv1 = velocity
-
-        // ks2 = acceleration from (position + kv1 * dt/2)
-        // kv2 = velocity + ks2 * dt/2
-
-        // ks3 = acceleration from (position + kv2*dt/2)
-        // kv3 = velocity + ks2*dt/2
-
-        // ks4 = acceleration from (position + ks3 * dt)
-        // kv4 = velocity + ks3*dt
-
-        // s += dt/6 * (kv1 + 2kv2 + 2kv3 + kv4)
-        // v = dt/6 * (ks1 + 2ks2 + 2ks3 + ks4)
-
-        // so first we need to set the coefficients:
-        Vector3D[][] kv = new Vector3D[4][bodies.size()]; //velocity coefficients
-        Vector3D[][] ks = new Vector3D[4][bodies.size()]; //displacement coefficients:
-
-        //first coefficients:
-        // ks1: (and kv1)
-        // get positions and masses
-        Vector3D[] positions = new Vector3D[numBodies];
-        Double[] masses = new Double[numBodies];
-        //calculting kv[0]
-        for(int counter = 0; counter < numBodies;counter++){
-            Body currentBody = bodies.get(counter);
-            positions[counter] = currentBody.getPosition();// record relevant position and mass
-            masses[counter] = currentBody.getMass();
-            kv[0][counter] = currentBody.getVelocity(); // set first kv to velocity
+    private static boolean canRK4(double dt){
+        boolean valid = true;
+        if(dt < 0){
+            valid = false;
         }
-        ks[0] = getAllAccelerations(positions,masses); // pass those positions and masses to calc acceleration
-
-        ks[1] = getAllAccelerations(Vector3DArrayOperations.addVectors(positions, Vector3DArrayOperations.multiplyVectors(kv[0],dt/2)),masses);
-        kv[1] = Vector3DArrayOperations.addVectors(kv[0],Vector3DArrayOperations.multiplyVectors(ks[0],dt/2));
-
-        ks[2] = getAllAccelerations(Vector3DArrayOperations.addVectors(positions,Vector3DArrayOperations.multiplyVectors(kv[1],dt/2)),masses); // acc of(position + kv1 * dt/2)
-        kv[2] = Vector3DArrayOperations.addVectors(kv[0],Vector3DArrayOperations.multiplyVectors(ks[1],dt/2)); // velocity + ks1 * dt/2
-
-        ks[3] = getAllAccelerations(Vector3DArrayOperations.addVectors(positions,Vector3DArrayOperations.multiplyVectors(kv[2],dt)),masses); // acc of(position + kv2 * dt)
-        kv[3] = Vector3DArrayOperations.addVectors(kv[0],Vector3DArrayOperations.multiplyVectors(ks[2],dt)); // velocity + ks2 * dt
-
-        // use kv and ks to predict new position and velocity
-
-        int counter = 0;
-        Vector3D[] sumOfDisplacementCoefficients = new Vector3D[numBodies];
-        Vector3D[] sumOfVelocityCoefficients = new Vector3D[numBodies];
-
-        // apply correct multipliers:
-        ks[1] = Vector3DArrayOperations.multiplyVectors(ks[1], 2);
-        ks[2] = Vector3DArrayOperations.multiplyVectors(ks[2], 2);
-
-        kv[1] = Vector3DArrayOperations.multiplyVectors(kv[1], 2);
-        kv[2] = Vector3DArrayOperations.multiplyVectors(kv[2], 2);
+        ArrayList<Vector3D> positions = new ArrayList<>();
         for(Body body : bodies){
-            //get dt/6 * ks1+2ks2+2ks3+ks4
-            sumOfDisplacementCoefficients[counter]= Vector3D.add(Vector3D.add(Vector3D.add(ks[0][counter], ks[1][counter]),ks[2][counter]),ks[3][counter]);
-            sumOfDisplacementCoefficients[counter] = Vector3D.multiply(sumOfDisplacementCoefficients[counter], dt/6);
-
-            //get dt/6 * kv1+2kv2+2kv3+kv4
-            sumOfVelocityCoefficients[counter]= Vector3D.add(Vector3D.add(Vector3D.add(kv[0][counter], kv[1][counter]),kv[2][counter]),kv[3][counter]);
-            sumOfVelocityCoefficients[counter] = sumOfVelocityCoefficients[counter].multiply(dt/6);
-
-            body.setVelocity(body.getVelocity().addVector(sumOfDisplacementCoefficients[counter]));
-            body.setPosition(body.getPosition().addVector(sumOfVelocityCoefficients[counter]));
-            counter++;
+            Vector3D bodyPos = body.getPosition();
+            if(body.getMass() <= 0){
+                valid = false;
+            }
+            for(Vector3D pos : positions){
+                if(bodyPos.getComponent(0) == pos.getComponent(0) &&
+                        bodyPos.getComponent(1) == pos.getComponent(1) &&
+                        bodyPos.getComponent(2) == pos.getComponent(2)){
+                    valid = false;
+                }
+            }
+            positions.add(bodyPos);
         }
+        return valid;
     }
+    private static void RK4(double dt){
+        if(!canRK4(dt)){
+            //nothing will happen
+        }
+        else {
+            int numBodies = bodies.size();
+
+            // it is calculated as so:
+            // for each planet:
+            // ks1 = acceleration
+            // kv1 = velocity
+
+            // ks2 = acceleration from (position + kv1 * dt/2)
+            // kv2 = velocity + ks2 * dt/2
+
+            // ks3 = acceleration from (position + kv2*dt/2)
+            // kv3 = velocity + ks2*dt/2
+
+            // ks4 = acceleration from (position + ks3 * dt)
+            // kv4 = velocity + ks3*dt
+
+            // s += dt/6 * (kv1 + 2kv2 + 2kv3 + kv4)
+            // v = dt/6 * (ks1 + 2ks2 + 2ks3 + ks4)
+
+            // so first we need to set the coefficients:
+            Vector3D[][] kv = new Vector3D[4][bodies.size()]; //velocity coefficients
+            Vector3D[][] ks = new Vector3D[4][bodies.size()]; //displacement coefficients:
+
+            //first coefficients:
+            // ks1: (and kv1)
+            // get positions and masses
+            Vector3D[] positions = new Vector3D[numBodies];
+            double[] masses = new double[numBodies];
+            //calculting kv[0]
+            for (int counter = 0; counter < numBodies; counter++) {
+                Body currentBody = bodies.get(counter);
+                positions[counter] = currentBody.getPosition();// record relevant position and mass
+                masses[counter] = currentBody.getMass();
+                kv[0][counter] = currentBody.getVelocity(); // set first kv to velocity
+            }
+            ks[0] = getAllAccelerations(positions, masses); // pass those positions and masses to calc acceleration
+
+            ks[1] = getAllAccelerations(Vector3DArrayOperations.addVectors(positions, Vector3DArrayOperations.multiplyVectors(kv[0], dt / 2)), masses);
+            kv[1] = Vector3DArrayOperations.addVectors(kv[0], Vector3DArrayOperations.multiplyVectors(ks[0], dt / 2));
+
+            ks[2] = getAllAccelerations(Vector3DArrayOperations.addVectors(positions, Vector3DArrayOperations.multiplyVectors(kv[1], dt / 2)), masses); // acc of(position + kv1 * dt/2)
+            kv[2] = Vector3DArrayOperations.addVectors(kv[0], Vector3DArrayOperations.multiplyVectors(ks[1], dt / 2)); // velocity + ks1 * dt/2
+
+            ks[3] = getAllAccelerations(Vector3DArrayOperations.addVectors(positions, Vector3DArrayOperations.multiplyVectors(kv[2], dt)), masses); // acc of(position + kv2 * dt)
+            kv[3] = Vector3DArrayOperations.addVectors(kv[0], Vector3DArrayOperations.multiplyVectors(ks[2], dt)); // velocity + ks2 * dt
+
+            // use kv and ks to predict new position and velocity
+
+            int counter = 0;
+            Vector3D[] sumOfDisplacementCoefficients = new Vector3D[numBodies];
+            Vector3D[] sumOfVelocityCoefficients = new Vector3D[numBodies];
+
+            // apply correct multipliers:
+            ks[1] = Vector3DArrayOperations.multiplyVectors(ks[1], 2);
+            ks[2] = Vector3DArrayOperations.multiplyVectors(ks[2], 2);
+
+            kv[1] = Vector3DArrayOperations.multiplyVectors(kv[1], 2);
+            kv[2] = Vector3DArrayOperations.multiplyVectors(kv[2], 2);
+            for (Body body : bodies) {
+                //get dt/6 * ks1+2ks2+2ks3+ks4
+                sumOfDisplacementCoefficients[counter] = Vector3D.add(Vector3D.add(Vector3D.add(ks[0][counter], ks[1][counter]), ks[2][counter]), ks[3][counter]);
+                sumOfDisplacementCoefficients[counter] = Vector3D.multiply(sumOfDisplacementCoefficients[counter], dt / 6);
+
+                //get dt/6 * kv1+2kv2+2kv3+kv4
+                sumOfVelocityCoefficients[counter] = Vector3D.add(Vector3D.add(Vector3D.add(kv[0][counter], kv[1][counter]), kv[2][counter]), kv[3][counter]);
+                sumOfVelocityCoefficients[counter] = sumOfVelocityCoefficients[counter].multiply(dt / 6);
+
+                body.setVelocity(body.getVelocity().addVector(sumOfDisplacementCoefficients[counter]));
+                body.setPosition(body.getPosition().addVector(sumOfVelocityCoefficients[counter]));
+                body.getVelocity().setName("vel");
+                body.getPosition().setName("pos");
+                counter++;
+            }
+        }
+    } //set to private
 
     private static double COMcoefficient = 1;
     private static double velCoefficient = 1;
     private static double collisionCoefficient = 1e5;
-    private static double habitabilityCoefficient = 2;
+    private static double habitabilityCoefficient = 1e3;
     private static double findSignificance(){
         double significance = 0;
         //this subroutine is in charge of finding the significance of the interloper. First it needs some values
@@ -470,6 +526,7 @@ public class Simulator {        //this should be static class, alas java has oth
 
         noInterloperCOM = noInterloperCOM.multiply(1/sumOfOldMass);
         withInterloperCOM = withInterloperCOM.multiply(1/sumOfNewMass);
+
         //we do the same thing to the velocity to make it a bit more 'normalised':
         noInterloperSumOfVelocities = noInterloperSumOfVelocities.multiply(1/sumOfOldMass);
         withInterloperSumOfVelocities = withInterloperSumOfVelocities.multiply(1/sumOfNewMass);
@@ -569,4 +626,7 @@ public class Simulator {        //this should be static class, alas java has oth
 
     }
 
+   // public static void setLastSnapNoInterloper(ArrayList<Body> bodies){
+   //     lastSnapNoInterloper = bodies;
+   // }
 }

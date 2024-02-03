@@ -78,7 +78,7 @@ public class Vector3D {
     public static Vector3D add(Vector3D v1, Vector3D v2){
         v1 = nullTo0(v1);// if any Vectors are supplied which are null, change that to an
         v2 = nullTo0(v2);// empty new Vector
-        Vector3D vToReturn = new Vector3D(0,0,0);// make a new vector
+        Vector3D vToReturn = new Vector3D(0,0,0, v1.getName() + " + " + v2.getName());// make a new vector
         for(int counter = 0;counter <= 2;counter++){ // set each component to be the sum of the relevant components
             vToReturn.setComponent(counter, v1.getComponent(counter) + v2.getComponent(counter));
         }
@@ -89,7 +89,7 @@ public class Vector3D {
 
     public Vector3D addVector(Vector3D v1){
         v1 = nullTo0(v1);// if any Vectors are supplied which are null, change that to an empty new Vector
-        Vector3D returnVector = new Vector3D(0,0,0);
+        Vector3D returnVector = new Vector3D(0,0,0, this.getName() + " + " + v1.getName());
         for(int counter = 0;counter <= 2;counter++){ // set each component to be the sum of the relevant components
             returnVector.setComponent(counter, v1.getComponent(counter) + getComponent(counter));
         }
@@ -244,13 +244,13 @@ public class Vector3D {
     public Vector3D getDirection(Vector3D to){
         to = nullTo0(to);
 
-        Vector3D returnVector = new Vector3D(0,0,0);
+        Vector3D returnVector = new Vector3D(0,0,0, to.name + " from " + this.getName());
         int counter = 0;
         for(double component : to.getAllComponents()){
-            returnVector.setComponent(counter, (component - getComponent(counter)*-1));
+            returnVector.setComponent(counter, (component - getComponent(counter)));
             counter++;
         }
-        return  returnVector.getUnitVector();
+        return returnVector.getUnitVector();
     }
 
     public Vector3D returnCopy(){

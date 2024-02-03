@@ -1,5 +1,7 @@
 package Simulate;
 
+import com.example.nea.InputValidator;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,11 +12,14 @@ public class FileOperations {
     // this is a class which will be instantiated by the PlanetSystem class at runtime to handle outputting to CSV files
 
     public void openOutputFileHandle(String fileName){
-        if(fileName.contains(".")){
+        if(!InputValidator.validateStringExcludePeriod(fileName)){
             //  cannot contain . because that could lead to errors where the filename has ended
         }
         else if(writer != null){
             // cannot open a file handle if one already exists
+        }
+        else if(fileName == ""){
+            // no filename
         }
         else{
             try{// has to be in a try catch statement for Java to allow it
@@ -76,17 +81,23 @@ public class FileOperations {
 
     public void writeFirstLine(boolean hasInterloper, int systemID, String sysName){
         String ref = "";
-        if(hasInterloper) {
+        if(!hasInterloper) {
             ref = "WITHOUTINTERLOPER,";
         }
         else{
-            ref = "INTERLOPER,";//make clear to user what simulation this was by converting from true/false
+            ref = "WITHINTERLOPER,";//make clear to user what simulation this was by converting from true/false
         }
-        ref += sysName + "," + systemID + "..";// adds the rest of the needed data to the file
+        if(InputValidator.validateStringExcludePeriod(sysName)) {
+            ref += sysName + "," + systemID + "..";// adds the rest of the needed data to the file
+        }
+        else {
+            ref += "invalid name" + "," + systemID + "..";// adds the rest of the needed data to the file
+        }
         try {// tries to write it
             writer.write(ref + "\n");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
     }// writes the first line of the file which contains data about the simulation
 }

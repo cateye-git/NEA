@@ -15,6 +15,9 @@ public class Vector3DArrayOperations {
     }
 
     public static Vector3D[] multiplyVectors(Vector3D[] array, double mult){
+        if(Double.isNaN(mult)){
+            mult = 1;
+        }
         Vector3D[] out = new Vector3D[array.length];
         for(int index = 0;index<array.length;index++){
             out[index] = Vector3D.multiply(array[index],mult);

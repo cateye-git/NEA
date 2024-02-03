@@ -67,7 +67,7 @@ public class MariaDBConnector {
     public static DataStore[] getSystems(){
         int length = noOfEntries("system");
         DataStore[] ans = new DataStore[length]; //make a string array of length no of systems
-        ResultSet result = makeQuery("select * from system");
+        ResultSet result = makeQuery("select * from system;");
         try {
             int counter = 0;
             while (result.next()) {
@@ -77,6 +77,7 @@ public class MariaDBConnector {
                 ans[counter] = new DataStore(sysID,sysName);
                 counter++;
             }
+
         }
         catch (Exception e){
             System.out.println("error with getting systems: "+e);
@@ -129,7 +130,7 @@ public class MariaDBConnector {
             while(set.next()){
                 length++;
             }
-            System.out.println("Length is "+length+" line 128 creatorEditorController");
+           // System.out.println("Length is "+length+" line 133 creatorEditorController");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -211,6 +212,7 @@ public class MariaDBConnector {
         //I wouldn't normally do this because SQL likes to do this itself and why should I ruin its fun
         //but I will need these IDs so that I can add the new linker object
         int newPosID = getHighestID("position","posID") + 1;
+        //System.out.println("newPosID: "+newPosID);
         int newVelID = getHighestID("velocity", "velID") + 1;
 
         //then we need to get the data to copy
@@ -221,7 +223,7 @@ public class MariaDBConnector {
 
             //ok we have the data to copy now, so we need to actually copy it.
             //first make the new position and velocity:
-            makeQuery("insert into position velues ("+newPosID+", "+pos.getComponent(0)+","+pos.getComponent(1)+","+pos.getComponent(2)+");");
+            makeQuery("insert into position values ("+newPosID+", "+pos.getComponent(0)+","+pos.getComponent(1)+","+pos.getComponent(2)+");");
             makeQuery("insert into velocity values ("+newVelID+", "+vel.getComponent(0)+","+vel.getComponent(1)+","+vel.getComponent(2)+");");
             //we don't need to spawn in a new body because we are just making a new linker
             //so all that is left is to make said linker:
@@ -285,18 +287,21 @@ public class MariaDBConnector {
         Body returnBody = new Body(0,0,0,0,0,0,"unnamed",0,0,false);
         while (bodyDets.next()){
             //bodyID  name  mass  radius  illumination  type
-            String type = bodyDets.getString(6);
+            String type = bodyDets.getString("type");
             String name = bodyDets.getString(2);
             //int id = bodyDets.getInt(1);
             double mass = bodyDets.getDouble(3);
             double radius = bodyDets.getDouble(4);
 
-            if(type == "star"){
+           // System.out.println(type);
+            if(type.equals("star")){
                 double illumination = bodyDets.getInt(5);
                 returnBody = new Star(0,0,0,0,0,0,name,mass,radius,true,illumination);
+                //System.out.println("star");
             }
-            else if (type == "planet"){
+            else if (type.equals("planet")){
                 returnBody = new Planet(0,0,0,0,0,0,name,mass,radius,true);
+               // System.out.println("planet");
             }
             else{
                 returnBody = new Body(0,0,0,0,0,0,name,mass,radius,true);
@@ -479,7 +484,8 @@ public class MariaDBConnector {
             highest.next();
             id = highest.getInt(1);
         } catch (SQLException e) {
-            throw new RuntimeException("line 283 MariaDBConnector getting highest ID error: " + e);
+            //throw new RuntimeException("line 283 MariaDBConnector getting highest ID error: " + e);
+
         }
         return id;
     }

@@ -34,6 +34,9 @@ public class CreatorEditorController implements Initializable, CRUDInterface {
                 //because of my DataStore class this is really easy because I can literally just fetch it
 
                 DataStore selectedItem = SelectBody.getSelectionModel().getSelectedItem();
+                if(selectedItem == null){
+                    selectedItem = SelectBody.getItems().get(0);
+                }
                 idsOfSelectedItem = selectedItem.getIds();
                 CreatorDataStorage.setBodyID(idsOfSelectedItem[0]);
                 CreatorDataStorage.setPosID(idsOfSelectedItem[1]);
