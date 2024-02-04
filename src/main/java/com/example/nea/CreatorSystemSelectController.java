@@ -96,8 +96,13 @@ public class CreatorSystemSelectController implements Initializable, CRUDInterfa
                 //run when the system selected has changed
 
                 //so I need to get the IDs for the systems, which is made easy with my DataStore component
-
-                currentlySelectedItem = SelectSystemForSim.getSelectionModel().getSelectedItem().getIds()[0];
+                try {
+                    currentlySelectedItem = SelectSystemForSim.getSelectionModel().getSelectedItem().getIds()[0];
+                }
+                catch (Exception e){
+                    //then there is no selected item
+                    currentlySelectedItem = SelectSystemForSim.getItems().get(0).getIds()[0];
+                }
             }
         });
     }

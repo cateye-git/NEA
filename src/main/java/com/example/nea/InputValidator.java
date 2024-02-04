@@ -39,5 +39,12 @@ public class InputValidator {
         }
         return valid;
     }
+    public static boolean isDouble0(String in){
+        boolean valid = false;
+        if(Double.valueOf(in) == 0){
+            valid = true;
+        }
+        return valid;
+    }
 
 }

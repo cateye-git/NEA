@@ -64,17 +64,22 @@ public class SignificanceValueController implements Initializable {
         interloperStartPosField.setText(posString);
     }
 
-    private static String returnsf(double num, int sf, int exponent){
-        if(Math.abs(num) >= 10){
-            String ans = returnsf(num/10, sf, exponent+1);
-            return ans;
+
+    public static String returnsf(double num, int sf, int exponent){
+        try {
+            if (Math.abs(num) >= 10) {
+                String ans = returnsf(num / 10, sf, exponent + 1);
+                return ans;
+            } else if (Math.abs(num) < 1) {
+                String ans = returnsf(num * 10, sf, exponent - 1);
+                return ans;
+            } else {
+                return Math.round(num * Math.pow(10, sf - 1)) / Math.pow(10, sf - 1) + "e" + exponent;
+            }
         }
-        else if(Math.abs(num) < 1){
-            String ans = returnsf(num*10, sf, exponent-1);
-            return ans;
-        }
-        else{
-            return Math.round(num * Math.pow(10,sf-1))/Math.pow(10,sf-1)+"e"+exponent;
+        catch (Exception e){
+            return String.valueOf(num);
         }
     }
+   // private statis String returnsf(double num, int sf, int exponent)
 }

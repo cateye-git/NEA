@@ -29,7 +29,7 @@ public class Simulator3DClass {
     private final int screenWidth = 1400;        //  setting the width of the window
     private final int screenHeight = 1000;       //  setting the height of the window
 
-    private final double fileWriteInterval = 3600;
+    private final double fileWriteInterval = 86400;
     private double timeElapsed = 0;
     private double timeElapsedSinceLastFileWrite = 0;
 
@@ -37,7 +37,7 @@ public class Simulator3DClass {
 
     private final double mouseSens = 0.1f;
     private double camSpeed = 1e6*everythingMultiplier;
-    private double dtMultiplier = 1;
+    private double dtMultiplier = 0;
 
     private boolean following = false;
     private Body followBody;
@@ -70,10 +70,13 @@ public class Simulator3DClass {
         Simulator.endSimulation(timeElapsed);
     }
     public void getNewFollowPos(int id){
+        System.out.println("new follow pos: "+id);
 
         //find body with this ID
 
         for(Body body : bodies){
+
+            System.out.println("body: "+body + " id: " +body.getSimulationID());
             if(body.getSimulationID() == id){
                 //then we have found the correct ID
                 followBody = body;
@@ -204,11 +207,12 @@ public class Simulator3DClass {
                     }
                     int counter = 0;
                     for(Body body: bodies){
-                        spheres.add(new Sphere(body.getRadius()));
+                        spheres.add(new Sphere(body.getRadius() * 10));
                         group.getChildren().add(spheres.get(counter));
                         counter++;
                     }
                 }
+                //System.out.println(followBody);
                 //update remaining spheres
                 int counter =0;
                 try{

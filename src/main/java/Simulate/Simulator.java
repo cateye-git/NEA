@@ -114,7 +114,7 @@ public class Simulator {        //this should be static class, alas java has oth
     }
 
     public static void updateBodies(double dt, double time){
-        System.out.println("interloper is "+interloper + " w radius "+ interloper.getRadius());
+       // System.out.println("interloper is "+interloper + " w radius "+ interloper.getRadius());
         RK4(dt);
         checkCollisions(time);
         setHabitabilities(bodies);
@@ -150,7 +150,7 @@ public class Simulator {        //this should be static class, alas java has oth
     }
 
     static private double significanceCuttoff = 1e5;
-    static private double significanceMultiplier = 1e-5;
+    static private double significanceMultiplier = 0.6;
     public static void endSimulation(double time){
         loader = new SimulatorControllerLoad(stage);
         fileOps.closeOutputFileHandle();
@@ -340,8 +340,13 @@ public class Simulator {        //this should be static class, alas java has oth
             //have now done all accelerations for that body
             currentBody++;
         }
-        for(Vector3D acc : accelerations){
-            acc.setName("acc");
+        try {
+            for (Vector3D acc : accelerations) {
+                acc.setName("acc");
+            }
+        }
+        catch (Exception e){
+
         }
 
         if(accelerations.length == 1){

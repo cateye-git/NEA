@@ -54,13 +54,21 @@ public class _3DBodySimulatorController implements Initializable {
         for (Body body : Simulator.getBodies()) {
             selectBody.getItems().add(body);
         }
-        selectBody.setOnAction(this::selectBodyToFollow);
+       // selectBody.setOnAction(this::selectBodyToFollow);
         selectBody.setOnMousePressed(this::updateBodies);
-        selectBody.setValue(Simulator.getBodies().get(0));
+      //  selectBody.setValue(Simulator.getBodies().get(0));
+        //go through each body in Simulate and set their simulation ID
+        int simID = 0;
+        for(Body body : Simulator.getBodies()){
+            simID++;
+            body.setSimulationID(simID);
+        }
+
 
         dtSlider.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                //so just when changed set the value in the 3D window
                 double dtValue = dtSlider.getValue();
                 Simulation.changedtValue(dtValue);
             }
@@ -68,6 +76,7 @@ public class _3DBodySimulatorController implements Initializable {
 
         camSpeedSlider.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
+            //so just when changed set the value in the 3D window
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 double camSpeedValue = camSpeedSlider.getValue();
                 Simulation.changeCamSpeedValue(camSpeedValue);
@@ -96,6 +105,7 @@ public class _3DBodySimulatorController implements Initializable {
         }
     }
 
+    @FXML
     private void selectBodyToFollow(ActionEvent event){
         //update items in selection box
         int id;

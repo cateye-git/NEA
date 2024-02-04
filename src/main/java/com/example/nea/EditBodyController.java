@@ -167,6 +167,10 @@ public class EditBodyController implements Initializable {
             {
                 changed = true;
             };
+            if(InputValidator.isDouble0(mass.getText())){
+                changed = false;
+                System.out.println("mass 0!");
+            }
 
         }catch (Exception e){
             throw new RuntimeException("error at ln 144 EditBodyController: "+e);
