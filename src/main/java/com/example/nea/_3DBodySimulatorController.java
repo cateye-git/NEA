@@ -24,6 +24,9 @@ public class _3DBodySimulatorController implements Initializable {
     private ComboBox<Body> selectBody;
 
     @FXML
+    private Slider radiusSlider;
+
+    @FXML
     private Slider dtSlider;
     @FXML
     private Slider camSpeedSlider;
@@ -79,7 +82,16 @@ public class _3DBodySimulatorController implements Initializable {
             //so just when changed set the value in the 3D window
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 double camSpeedValue = camSpeedSlider.getValue();
-                Simulation.changeCamSpeedValue(camSpeedValue);
+                Simulation.changeCamSpeedValue(Math.pow(10,camSpeedValue)/10);
+            }
+        });
+
+
+        radiusSlider.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            //so just when changed set the value in the 3D window
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                Simulation.changeRadiusMultiplier(Math.pow(10,radiusSlider.getValue())/10);
             }
         });
 

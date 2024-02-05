@@ -142,8 +142,8 @@ public class MariaDBConnector {
                     "linker.systemID = "+id+" and velocity.velID = linker.velID and position.posID = linker.posID;");
             int counter = 0;
             while(bodyDetails.next()){
-                Vector3D pos = new Vector3D(bodyDetails.getInt(4),bodyDetails.getInt(5),bodyDetails.getInt(6));
-                Vector3D vel = new Vector3D(bodyDetails.getInt(7),bodyDetails.getInt(8),bodyDetails.getInt(9));
+                Vector3D pos = new Vector3D(bodyDetails.getLong(4),bodyDetails.getLong(5),bodyDetails.getLong(6));
+                Vector3D vel = new Vector3D(bodyDetails.getLong(7),bodyDetails.getLong(8),bodyDetails.getLong(9));
 
                 int[] ids = {bodyDetails.getInt(1),bodyDetails.getInt(2),bodyDetails.getInt(3)};
                 String prettyString = bodyDetails.getString(10) + pos.returnComponentsAsString()+" "+vel.returnComponentsAsString();

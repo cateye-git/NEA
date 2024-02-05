@@ -25,6 +25,7 @@ public class Simulator3DClass {
 
     private AnimationTimer timer;
     private final double everythingMultiplier = 1e-5f;
+    private double radiusMultiplier = 1;
 
     private final int screenWidth = 1400;        //  setting the width of the window
     private final int screenHeight = 1000;       //  setting the height of the window
@@ -37,6 +38,7 @@ public class Simulator3DClass {
 
     private final double mouseSens = 0.1f;
     private double camSpeed = 1e6*everythingMultiplier;
+    private double averageSize;
     private double dtMultiplier = 0;
 
     private boolean following = false;
@@ -89,6 +91,7 @@ public class Simulator3DClass {
         camLocalYpos = 0;
         camLocalZpos = -followBody.getRadius()*3*everythingMultiplier;
 
+
         //set all translations relative to this body
       //  translateCam();
     }
@@ -101,6 +104,8 @@ public class Simulator3DClass {
 
         //import spheres as bodies
         ArrayList<Sphere> spheres = new ArrayList<>();
+        double sumOfSizes = 0;
+        double noBodies = 0;
         for(Body body : bodies){
             Sphere sphere = new Sphere(0);
             sphere.setRadius(body.getRadius()*everythingMultiplier);
@@ -109,9 +114,11 @@ public class Simulator3DClass {
             sphere.translateZProperty().set(body.getPosition().getComponent(2)*everythingMultiplier);
             //System.out.println("added sphere at "+body.getPosition().getComponent(0)+ " " + body.getPosition().getComponent(1)*-1 + " "+ body.getPosition().getComponent(2));
             group.getChildren().add(sphere);
-
+            sumOfSizes+= body.getRadius()*everythingMultiplier;
+            noBodies++;
             spheres.add(sphere);
         }
+        averageSize = sumOfSizes/noBodies;
 
         followBody = bodies.get(0);
 
@@ -122,6 +129,7 @@ public class Simulator3DClass {
         cam.setNearClip(0.01f);
         cam.setFarClip(1e100);
         cam.setFieldOfView(90);
+       // cam.setDe
 
       //  cam.translateZProperty().set(cam.getTranslateZ() -100);     //  moving the camera back
         scene.setFill(Paint.valueOf("black"));
@@ -220,7 +228,7 @@ public class Simulator3DClass {
                     Vector3D bodyPos = body.getPosition();
                     Sphere sphere = spheres.get(counter);
 
-                    sphere.setRadius(body.getRadius()*everythingMultiplier);
+                    sphere.setRadius(body.getRadius()*everythingMultiplier * radiusMultiplier);
                     sphere.setTranslateX(bodyPos.getComponent(0)*everythingMultiplier);
                     sphere.setTranslateY(bodyPos.getComponent(1)*-everythingMultiplier);
                     sphere.setTranslateZ(bodyPos.getComponent(2)*everythingMultiplier);
@@ -262,6 +270,9 @@ public class Simulator3DClass {
         dtMultiplier = val;
     }
     public void changeCamSpeedValue(double val){
-        camSpeed = val;
+        camSpeed = val * averageSize / 10;
+    }
+    public void changeRadiusMultiplier(double val){
+        radiusMultiplier = val;
     }
 }
