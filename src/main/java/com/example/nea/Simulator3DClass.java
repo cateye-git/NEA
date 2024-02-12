@@ -100,14 +100,15 @@ public class Simulator3DClass {
     public void main3D(Stage primaryStage) throws IOException{
         myStage = primaryStage;
 
-        bodies = Simulator.getBodies();
-        System.out.println(bodies);
+
+       // System.out.println(bodies);
         Group group = new Group();
 
         //import spheres as bodies
         ArrayList<Sphere> spheres = new ArrayList<>();
         double sumOfSizes = 0;
         double noBodies = 0;
+        bodies = Simulator.getBodies();
         for(Body body : bodies){
             Sphere sphere = new Sphere(0);
             sphere.setRadius(body.getRadius()*everythingMultiplier);

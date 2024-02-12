@@ -43,13 +43,14 @@ public class SignificanceValueController implements Initializable {
     public void resimulatePressed(ActionEvent event) throws IOException{
         //update interloper
 
-        System.out.println("wzzzzzzzzzzzzzzzzzz" + Simulator.getBodies());
+
         Simulator.updateInterloperMass();
         //rerun simulation
         Simulator.restart();
 
         com.example.nea.FXMLLoader.changeInExistingWindow(event,"3DBodySimulator.fxml");
         Simulator.ensureBodiesHasBeenReset();
+        Simulator.beginFileOutput();
     }
 
     public void exitPressed(){
@@ -61,14 +62,14 @@ public class SignificanceValueController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        System.out.println("wefuahfaiefuqhiefqew" + Simulator.getBodies());
+
         oldMassField.setText(String.valueOf(Simulator.getInterloper().getMass()));
         sigValueField.setText(String.valueOf(Simulator.getInterloperSignificance()));
         newMassField.setText(String.valueOf(Simulator.getProposedNewMass()));
         double[] pos = Simulator.getInterloper().getPosition().getAllComponents();
         String posString = "("+returnsf(pos[0],3,0) + ", "+returnsf(pos[1],3,0)+", "+returnsf(pos[2],3,0)+")";
         interloperStartPosField.setText(posString);
-        System.out.println("8q9ry2347298t72" + Simulator.getBodies());
+
     }
 
 

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 public class FileOperations {
     private FileWriter writer;  // a variable with the scope of the object which is used by several methods
+    private boolean isWriterOpen = false;
 
     // this is a class which will be instantiated by the PlanetSystem class at runtime to handle outputting to CSV files
 
@@ -24,6 +25,8 @@ public class FileOperations {
         else{
             try{// has to be in a try catch statement for Java to allow it
                 writer = new FileWriter(fileName);
+                System.out.println("opening file of name "+fileName);
+                isWriterOpen = true;
             }
             catch (IOException e) {
                 throw new RuntimeException(e);
@@ -35,10 +38,12 @@ public class FileOperations {
         System.out.println("closing file ");
         if(writer == null){
             //throw new RuntimeException("file handle doesnt exist");// have to open one first
+            System.out.println("There is no file to close");
         }
         else{
             try {
                 writer.close();//   again, has to be in a try catch clause so that Java will allow it
+                isWriterOpen = false;
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -46,16 +51,18 @@ public class FileOperations {
     }// tries to close the fileWriter
 
     private void writeLineOfFile(String[] data){
-        String whatToWrite = "";
-        for(String item : data){
-            whatToWrite = whatToWrite + item + "..";// puts full stop between different data items
-        }
-        //System.out.println(whatToWrite);
-        try {
-            writer.write(whatToWrite+"\n");// tries to write it to the file
+        if(isWriterOpen) {
+            String whatToWrite = "";
+            for (String item : data) {
+                whatToWrite = whatToWrite + item + "..";// puts full stop between different data items
+            }
+            //System.out.println(whatToWrite);
+            try {
+                writer.write(whatToWrite + "\n");// tries to write it to the file
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }// takes in an array of data and writes it to the file
 

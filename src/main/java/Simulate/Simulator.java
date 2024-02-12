@@ -64,7 +64,7 @@ public class Simulator {        //this should be static class, alas java has oth
     }
 
     private static Body interloper;
-    private static boolean interloperIsSelected = true;
+    private static boolean interloperIsSelected = false;
     private static boolean interloperInSimulation= false;
 
     private static FileOperations fileOps;
@@ -81,13 +81,21 @@ public class Simulator {        //this should be static class, alas java has oth
         originalBodies = getSystemData();
         bodies = getSystemData();
         interloperInSimulation = withInterloper;
-        fileOps.openOutputFileHandle(getSystemName()+interloperInSimulation);
+        fileOps.openOutputFileHandle(getSystemName()+interloperIsSelected);
     }
 
     public static void restart(){
         fileOps = new FileOperations();
-        fileOps.openOutputFileHandle(getSystemName()+interloperInSimulation);
-        fileOps.writeFirstLine(interloperInSimulation, sysID,getSystemName());
+        System.out.println("interloperInSimulation at restart 106 simulator = "+interloperIsSelected);
+
+
+
+//          contents moved to beginFileOutput
+    }
+
+    public static void beginFileOutput(){
+        fileOps.openOutputFileHandle(getSystemName()+interloperIsSelected); //this shouldn't be here because it's overwriting the current (useful) file
+        fileOps.writeFirstLine(interloperIsSelected, sysID,getSystemName());
     }
 
     public static void setInterloper(Body inter) {
@@ -96,23 +104,24 @@ public class Simulator {        //this should be static class, alas java has oth
         interloper = inter;
         interloperCopy = interloper.returnCopy();
         interloperIsSelected = true;
-        fileOps.writeFirstLine(true, sysID,getSystemName());
-        if(interloperInSimulation){
-            Body interloperCopy = (Body) interloper.clone();
-            bodies.add(interloperCopy);
-        }
+        fileOps.writeFirstLine(false, sysID,getSystemName());    // why are these here?
+     //   if(interloperInSimulation){
+        Body interloperCopy = (Body) interloper.clone();
+        bodies.add(interloperCopy);
+     //   interloperIsSelected = true;
+      //  }
     }
     public static void setRandomInterloper(){
         //when the user asks for random interloper
         interloper = getRandomInterloper(bodies);
         interloperCopy = interloper.returnCopy();
      //   interloperCopy.setName("interloper copy");
-        fileOps.writeFirstLine(true, sysID,getSystemName());
+        interloperIsSelected = true;
+        fileOps.writeFirstLine(false, sysID,getSystemName());    // why are these here?
 
-        if(interloperInSimulation){
-            Body interloperCopy = (Body) interloper.clone();
-            bodies.add(interloperCopy);
-        }
+        Body interloperCopy = (Body) interloper.clone();
+        bodies.add(interloperCopy);
+      //  interloperIsSelected = true;
     }
     public static void noInterloper(){
         interloperIsSelected = false;
@@ -157,7 +166,7 @@ public class Simulator {        //this should be static class, alas java has oth
         for(Body body:originalBodies){
             newBodies.add(body.returnCopy());
         }
-        System.out.println("originalBodies: "+originalBodies);
+      //  System.out.println("originalBodies: "+originalBodies);
         return newBodies;
     }
 
@@ -190,14 +199,14 @@ public class Simulator {        //this should be static class, alas java has oth
             interloperSignificance = findSignificance(); //this returns a number which corresponds to the significance;
             noCollisionsInter = 0;
             //now we need to find a new mass of the interloper based on this significance
-           // proposedNewMass = interloper.getMass() / ((interloperSignificance/significanceCuttoff)*significanceMultiplier); LEGACY
+           // proposedNewMass = interloper.getMass() / ((interloperSignificance/significanceCuttoff)*significanceMultiplier); LEGACY leave to show for tech.sol.
             if(interloperSignificance == 0){
                 interloperSignificance = 0.01; // to avoid NaN
             }
             if(interloperSignificance < 0){
                 interloperSignificance = -interloperSignificance;
             }
-
+        //    interloperInSimulation = true;
 
 
             double significanceEffect = interloperSignificance / significanceCuttoff;
@@ -205,7 +214,7 @@ public class Simulator {        //this should be static class, alas java has oth
             proposedNewMass = interloper.getMass()/significanceEffect;
             interloperCopy.setMass(proposedNewMass);
             //then we show it to the user:
-            interloperInSimulation = true;
+
             stageOfRunning = "runningWithInterloper";
             loader.load("SignificanceValue.fxml", "Controls");
             bodies = makeNewBodyList();
@@ -214,6 +223,7 @@ public class Simulator {        //this should be static class, alas java has oth
 
         }
         else{
+            interloperInSimulation = true;
             //then the user has selected an interloper, and it hasn't been done yet, so we will play the simulation again with the interloper.
 
             //first we need the quitting time so that we know when to quit next time
@@ -222,20 +232,19 @@ public class Simulator {        //this should be static class, alas java has oth
             for(Body body : getBodies()){
                 lastSnapNoInterloper.add(body.returnCopy());
             }
-           // System.out.println("size of last snap is: "+lastSnapNoInterloper.size());
             //now reset the bodies to the original and add the interloper
             bodies = makeNewBodyList();
             bodies.add(interloper);
             loader.load("3DBodySimulator.fxml", "3D body");
 
-            interloperInSimulation = true;
+
             stageOfRunning = "runningWithInterloper";
 
             restart();
 
         }
 
-        System.out.println(interloper);
+       // System.out.println(interloper);
     }
 
     private static Body getRandomInterloper(ArrayList<Body> bodies){
@@ -577,6 +586,7 @@ public class Simulator {        //this should be static class, alas java has oth
         System.out.println("VEL change = "+velChange);
      //   double noCollisions = Math.abs(origSize - newSize); //this is the no of collisions
         double noCollisions = Math.abs(noCollisionsInter - noCollisionsNoInter);
+        System.out.println(" w interloper coll = "+noCollisionsInter+ " w/out = "+noCollisionsNoInter);
         System.out.println("noCollisions = "+noCollisions);
         double habitabilityChange = Math.abs(withInterloperHabitability - noInterloperHabitability);
         System.out.println("habitability change = " + habitabilityChange);
@@ -682,7 +692,7 @@ public class Simulator {        //this should be static class, alas java has oth
    // }
 
     public static void ensureBodiesHasBeenReset(){
-        System.out.println("resetting bodies");
+       // System.out.println("resetting bodies");
         bodies = makeNewBodyList();
         if(interloperInSimulation){
             bodies.add(interloperCopy.returnCopy());
