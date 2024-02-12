@@ -23,9 +23,7 @@ public class main extends Application {
     }
 
     public static void main(String[] args) {
-        System.out.println("opening connection");
         MariaDBConnector.openConnection();
         launch();
-
     }
 }

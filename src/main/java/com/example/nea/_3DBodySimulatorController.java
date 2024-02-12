@@ -39,7 +39,7 @@ public class _3DBodySimulatorController implements Initializable {
 
     public void closeSim(ActionEvent event) throws Exception {
         //Simulator.endSimulation();
-        System.out.println("line 39 3dBodySimulatorController - stopping system");
+     //   System.out.println("line 39 3dBodySimulatorController - stopping system");
         Simulation.stopAll();
         timer.stop();
     }
@@ -73,7 +73,7 @@ public class _3DBodySimulatorController implements Initializable {
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 //so just when changed set the value in the 3D window
                 double dtValue = dtSlider.getValue();
-                Simulation.changedtValue(dtValue);
+                Simulation.changedtValue(Math.pow(10, dtValue));
             }
         });
 

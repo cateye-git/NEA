@@ -22,11 +22,13 @@ import java.util.ResourceBundle;
 
 public class SignificanceValueController implements Initializable {
 
+    /*
     private Stage stage;
     private Scene scene;
     private Parent root;
     @FXML
     private Button resimulateButton;
+     */
     @FXML
     private Button exitButton;
     @FXML
@@ -40,11 +42,14 @@ public class SignificanceValueController implements Initializable {
 
     public void resimulatePressed(ActionEvent event) throws IOException{
         //update interloper
+
+        System.out.println("wzzzzzzzzzzzzzzzzzz" + Simulator.getBodies());
         Simulator.updateInterloperMass();
         //rerun simulation
         Simulator.restart();
 
         com.example.nea.FXMLLoader.changeInExistingWindow(event,"3DBodySimulator.fxml");
+        Simulator.ensureBodiesHasBeenReset();
     }
 
     public void exitPressed(){
@@ -56,12 +61,14 @@ public class SignificanceValueController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        System.out.println("wefuahfaiefuqhiefqew" + Simulator.getBodies());
         oldMassField.setText(String.valueOf(Simulator.getInterloper().getMass()));
         sigValueField.setText(String.valueOf(Simulator.getInterloperSignificance()));
         newMassField.setText(String.valueOf(Simulator.getProposedNewMass()));
         double[] pos = Simulator.getInterloper().getPosition().getAllComponents();
         String posString = "("+returnsf(pos[0],3,0) + ", "+returnsf(pos[1],3,0)+", "+returnsf(pos[2],3,0)+")";
         interloperStartPosField.setText(posString);
+        System.out.println("8q9ry2347298t72" + Simulator.getBodies());
     }
 
 
@@ -77,7 +84,7 @@ public class SignificanceValueController implements Initializable {
                 return Math.round(num * Math.pow(10, sf - 1)) / Math.pow(10, sf - 1) + "e" + exponent;
             }
         }
-        catch (Exception e){
+        catch (StackOverflowError e){
             return String.valueOf(num);
         }
     }

@@ -17,12 +17,13 @@ import javafx.scene.transform.Transform;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ResourceBundle;
 
 public class Simulator3DClass {
-
     private AnimationTimer timer;
     private final double everythingMultiplier = 1e-5f;
     private double radiusMultiplier = 1;
@@ -30,7 +31,7 @@ public class Simulator3DClass {
     private final int screenWidth = 1400;        //  setting the width of the window
     private final int screenHeight = 1000;       //  setting the height of the window
 
-    private final double fileWriteInterval = 86400;
+    private final double fileWriteInterval = 1209600;
     private double timeElapsed = 0;
     private double timeElapsedSinceLastFileWrite = 0;
 
@@ -66,19 +67,19 @@ public class Simulator3DClass {
 
         //close this window for the user
         //stop application from still running
-        System.out.println("line 67 Simulator3DClass stopping all");
+      //  System.out.println("line 67 Simulator3DClass stopping all");
         timer.stop();
-        myStage.close();
         Simulator.endSimulation(timeElapsed);
+        myStage.close();
     }
     public void getNewFollowPos(int id){
-        System.out.println("new follow pos: "+id);
+        //System.out.println("new follow pos: "+id);
 
         //find body with this ID
 
         for(Body body : bodies){
 
-            System.out.println("body: "+body + " id: " +body.getSimulationID());
+            //   System.out.println("body: "+body + " id: " +body.getSimulationID());
             if(body.getSimulationID() == id){
                 //then we have found the correct ID
                 followBody = body;
@@ -100,6 +101,7 @@ public class Simulator3DClass {
         myStage = primaryStage;
 
         bodies = Simulator.getBodies();
+        System.out.println(bodies);
         Group group = new Group();
 
         //import spheres as bodies

@@ -1,6 +1,6 @@
 package Simulate;
 
-public class Body {
+public class Body implements Cloneable {
     public int getSimulationID() {
         return simulationID;
     }
@@ -101,7 +101,15 @@ public class Body {
     }
 
     public Body returnCopy(){
-        Body returnBody = new Body(position.returnCopy(),velocity.returnCopy(),name,mass, radius, significant);
-        return  returnBody;
+        Body returnBody = new Body(position.returnCopy(),velocity.returnCopy(),String.valueOf(name),mass, radius, significant);
+        return returnBody;
+    }
+
+    public Object clone(){
+        try{
+            return super.clone();
+        }catch(Exception e){
+            return null;
+        }
     }
 }
